@@ -39,13 +39,13 @@ function Main() { // tab navigator component that is embeded inside of stack nav
 			headerShown: false,
 		}}>
 			<Tab.Screen name='list'>
-				{(props) => <List {...props,setTDel,setTEdit,nTask,curT} />}
+				{(props) => <List {...props} setTDel={setTDel} setTEdit={setTEdit} nTask={nTask} curT={curT} />}
 			</Tab.Screen>
 			<Tab.Screen name='plan'>
-				{(props) => <Plan {...props,tDel,tEdit,setCur,setNTask,setCurT} />}
+				{(props) => <Plan {...props} tDel={tDel} tEdit={tEdit} setCur={setCur} setNTask={setNTask} setCurT={setCurT} />}
 			</Tab.Screen>
 			<Tab.Screen name='archive'>
-				{(props) => <Archive {...props,cur} />}
+				{(props) => <Archive {...props} cur={cur} />}
 			</Tab.Screen>
 		</Tab.Navigator>
 	);
@@ -109,7 +109,7 @@ export default function App() {
 			}}>
 				<Stack.Screen name='about' component={About} />
 				<Stack.Screen name='settings'>
-					{(props) => <Settings {...props,dispatch} />}
+					{(props) => <Settings {...props} dispatch={dispatch} />}
 				</Stack.Screen>
 				<Stack.Screen name='main' component={Main} />
 			</Stack.Navigator></SettingsContext.Provider></NavigationContainer>
