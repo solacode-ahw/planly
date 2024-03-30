@@ -9,6 +9,7 @@ import { useReducer, useEffect, useState, useContext } from 'react';
 
 import { SettingsContext, settingReducer } from './utils/hooks';
 import { getTheme } from './utils/functions';
+import { initDB } from './utils/data';
 
 import About from './screens/about';
 import Settings from './screens/settings';
@@ -95,8 +96,12 @@ export default function App() {
 				value: val?Number(val):6,
 			});
 		}
-		// database prep code
-		setLoaded(true);
+		// database initialization
+		const dbSetup = async() => {
+			await initDB();
+			setLoaded(true);
+		};
+		dbSetup();
 	},[]);
 
 	if(!loaded || !font){
@@ -116,12 +121,3 @@ export default function App() {
 		);
 	}
 }
-
-
-/*
-
-	TO DO
-
-	1. setup database
-
-*/
