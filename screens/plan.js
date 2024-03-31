@@ -1,3 +1,3 @@
 
 
-export default function Plan({tDel,tEdit,setCur,setNTask,setCurT}){}
+export default function Plan({tDel,tEdit,setCur,setNTask,setCurT,cats}){}

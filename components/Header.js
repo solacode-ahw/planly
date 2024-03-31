@@ -1,10 +1,11 @@
-import { View, Text, Image, Pressable, StyleSheet, StatusBar } from "react-native";
+import { Text, Image, Pressable, StyleSheet, StatusBar } from "react-native";
 import { useContext } from "react";
 
 import { themeColors } from "../utils/colors";
-import { background } from "../utils/styles";
 import { SettingsContext } from "../utils/hooks";
 import { getTheme,getColor } from "../utils/functions";
+
+import { PlanlyView } from "./basics";
 
 
 function HeaderButton({icon,fill,action}){ // component for the header buttons
@@ -21,12 +22,12 @@ export default function Header({navigation,route}){ // component to replace defa
 	const theme = getTheme(useContext(SettingsContext).thm);
 
 	return (
-		<View style={{...styles.header,...background[theme]}}>
+		<PlanlyView transparent={false} style={styles.header}>
 			<StatusBar backgroundColor={themeColors[theme]} barStyle={theme==='dark'?'light-content':'dark-content'} />
 			<Text style={styles.name}>PLANLY</Text>
 			<HeaderButton icon='about' fill={route.name==='about'} action={()=>navigation.navigate('about')} />
 			<HeaderButton icon='setting' fill={route.name==='settings'} action={()=>navigation.navigate('settings')} />
-		</View>
+		</PlanlyView>
 	);
 }
 

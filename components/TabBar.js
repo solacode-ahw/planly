@@ -1,10 +1,11 @@
-import { View, Pressable, Image, StyleSheet } from "react-native";
+import { Pressable, Image, StyleSheet } from "react-native";
 import { useContext } from "react";
 
 import { themeColors } from "../utils/colors";
-import { background } from "../utils/styles";
 import { SettingsContext } from "../utils/hooks";
 import { getColor } from "../utils/functions";
+
+import { PlanlyView } from "./basics";
 
 
 function TabBarButton({icon,fill,action}){ // component for the tab bar buttons
@@ -21,11 +22,11 @@ export default function TabBar({state,navigation,theme}){ // component to replac
 	const name = state.routeNames[state.index];
 
 	return (
-		<View style={{...styles.bar,...background[theme]}}>
+		<PlanlyView transparent={false} style={styles.bar}>
 			<TabBarButton icon='list' fill={name==='list'} action={()=>navigation.navigate('list')} />
 			<TabBarButton icon='plan' fill={name==='plan'} action={()=>navigation.navigate('plan')} />
 			<TabBarButton icon='archive' fill={name==='archive'} action={()=>navigation.navigate('archive')} />
-		</View>
+		</PlanlyView>
 	);
 }
 
