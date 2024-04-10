@@ -136,6 +136,7 @@ const styles = StyleSheet.create({
 		alignContent: 'stretch',
 		display: 'flex',
 		flexGrow: 1,
+		flexShrink: 1,
 	},
 	labelDone: {
 		textDecorationLine: 'line-through',

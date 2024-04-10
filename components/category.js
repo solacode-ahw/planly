@@ -147,6 +147,7 @@ const styles = StyleSheet.create({
 	label: {
 		display: 'flex',
 		flexGrow: 1,
+		flexShrink: 1,
 		alignContent: 'stretch',
 	},
 	taskContainer: {
