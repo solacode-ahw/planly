@@ -5,11 +5,11 @@ import { useFonts } from 'expo-font';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useReducer, useEffect, useState, useContext } from 'react';
+import { useReducer, useEffect, useState, useContext, useMemo } from 'react';
 
 import { SettingsContext, settingReducer } from './utils/hooks';
 import { getTheme } from './utils/functions';
-import { initDB } from './utils/data';
+import { initDB, Categories, Current } from './utils/data';
 
 import About from './screens/about';
 import Settings from './screens/settings';
@@ -27,29 +27,48 @@ const Tab = createBottomTabNavigator();
 
 function Main() { // tab navigator component that is embeded inside of stack navigator
 	const theme = getTheme(useContext(SettingsContext).thm);
-
 	// defining helper states that will signal a change between screens
-	const [tDel, setTDel] = useState(0);
-	const [tEdit, setTEdit] = useState(0);
-	const [cur, setCur] = useState(0);
-	const [nTask, setNTask] = useState(0);
-	const [curT, setCurT] = useState(0);
+	const [tDel, setTDel] = useState(0); // a task in present in current has been deleted in list page
+	const [tEdit, setTEdit] = useState(0); // a task in present in current has been edited in list page
+	const [cur, setCur] = useState(0); // the current day has been archived
+	const [nTask, setNTask] = useState(0); // a new task has been created from task picker
+	const [curT, setCurT] = useState(0); // a task has been edited from the plan page
 
-	return (
-		<Tab.Navigator initialRouteName='plan' backBehavior='initialRoute' tabBar={props => TabBar({...props,theme:theme})} screenOptions={{
-			headerShown: false,
-		}}>
-			<Tab.Screen name='list'>
-				{(props) => <List {...props} setTDel={setTDel} setTEdit={setTEdit} nTask={nTask} curT={curT} />}
-			</Tab.Screen>
-			<Tab.Screen name='plan'>
-				{(props) => <Plan {...props} tDel={tDel} tEdit={tEdit} setCur={setCur} setNTask={setNTask} setCurT={setCurT} />}
-			</Tab.Screen>
-			<Tab.Screen name='archive'>
-				{(props) => <Archive {...props} cur={cur} />}
-			</Tab.Screen>
-		</Tab.Navigator>
-	);
+	const [loaded,setLoaded] = useState(false);
+	const data = useMemo(()=>{ // getting the data used throughout the app
+		const getData = async(catList)=>{
+			await catList.getCats();
+			setLoaded(true);
+		};
+		let cats = new Categories();
+		let cur = new Current();
+		getData(cats);
+		return {
+			categories: cats, // the list of categories and their tasks
+			current: cur, // the current day information
+		};
+	},[]);
+
+	if(!loaded){
+		return null;
+	} else {
+		return (
+			<Tab.Navigator initialRouteName='plan' backBehavior='initialRoute' tabBar={props => TabBar({...props,theme:theme})} 
+					screenOptions={{
+						headerShown: false,
+				}}>
+				<Tab.Screen name='list'>
+					{(props) => <List {...props} setTDel={setTDel} setTEdit={setTEdit} nTask={nTask} curT={curT} data={data} />}
+				</Tab.Screen>
+				<Tab.Screen name='plan'>
+					{(props) => <Plan {...props} tDel={tDel} tEdit={tEdit} setCur={setCur} setNTask={setNTask} setCurT={setCurT} data={data} />}
+				</Tab.Screen>
+				<Tab.Screen name='archive'>
+					{(props) => <Archive {...props} cur={cur} />}
+				</Tab.Screen>
+			</Tab.Navigator>
+		);
+	}
 }
 
 export default function App() {
@@ -109,14 +128,13 @@ export default function App() {
 	} else {
 		hideAsync();
 		return (
-			<NavigationContainer><SettingsContext.Provider value={settings}><Stack.Navigator initialRouteName='main' screenOptions={{
-				header: Header,
-			}}>
-				<Stack.Screen name='about' component={About} />
-				<Stack.Screen name='settings'>
-					{(props) => <Settings {...props} dispatch={dispatch} />}
-				</Stack.Screen>
-				<Stack.Screen name='main' component={Main} />
+			<NavigationContainer><SettingsContext.Provider value={settings}>
+				<Stack.Navigator initialRouteName='main' screenOptions={{ header: Header}}>
+					<Stack.Screen name='about' component={About} />
+					<Stack.Screen name='settings'>
+						{(props) => <Settings {...props} dispatch={dispatch} />}
+					</Stack.Screen>
+					<Stack.Screen name='main' component={Main} />
 			</Stack.Navigator></SettingsContext.Provider></NavigationContainer>
 		);
 	}
