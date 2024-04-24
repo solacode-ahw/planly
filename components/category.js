@@ -13,7 +13,7 @@ import { EditCategory, Warning, NewTask } from "./modals";
 import { TaskItem } from "./task";
 
 
-export function CategoryItem({cat,refresh,picker,onDel,onEdit,onAddTask,onEditTask,onDelTask,items}){
+export function CategoryItem({cat,refresh,picker,onDel,onEdit,onAddTask,onEditTask,onDelTask,onPick,items,picks=[]}){
 	/*
 		the component which views a category with its tasks
 
@@ -31,6 +31,7 @@ export function CategoryItem({cat,refresh,picker,onDel,onEdit,onAddTask,onEditTa
 	const lang = useContext(SettingsContext).lang;
 
 	const tasks = useRef([]);
+	const last = useRef(0);
 	const [load,setLoad] = useState(0);
 	const [loaded,setLoaded] = useState(0);
 
@@ -43,8 +44,16 @@ export function CategoryItem({cat,refresh,picker,onDel,onEdit,onAddTask,onEditTa
 	useEffect(()=>{
 		// retrieves the tasks objects of categorie's tasks
 		const get = async(id)=>{
-			tasks.current.push(await getTask(id));
+			if(!picks.includes(id)){
+				tasks.current.push(await getTask(id));
+				if(tasks.current.at(-1).done && !tasks.current.at(-2).done){
+					last.current = tasks.current.at(-2).id;
+				}
+			}
 			if(id===cat.tasks.at(-1)){
+				if(last.current===0){
+					last.current=id;
+				}
 				setLoaded(loaded+1);
 			}
 		};
@@ -52,6 +61,7 @@ export function CategoryItem({cat,refresh,picker,onDel,onEdit,onAddTask,onEditTa
 		if(cat.tasks.length===0){
 			setLoaded(true);
 		} else {
+			last.current = 0;
 			cat.tasks.forEach(tid=>{
 				get(tid);
 			});
@@ -79,21 +89,11 @@ export function CategoryItem({cat,refresh,picker,onDel,onEdit,onAddTask,onEditTa
 		await cat.getTasks();
 		setLoad(load+1);
 	};
-	const upTask = async(id,rank) => {
-		// moves given task one up
-		if(cat.tasks.at(0)!==id){
-			await cat.moveUp(cat.id,id,rank);
-			await cat.getTasks();
-			setLoad(load+1);
-		}
-	};
 	const downTask = async(id,rank) => {
 		// moves given task one down
-		if(cat.tasks.at(-1)!==id){
-			await cat.moveDown(cat.id,id,rank);
-			await cat.getTasks();
-			setLoad(load+1);
-		}
+		await cat.moveDown(cat.id,id,rank);
+		await cat.getTasks();
+		setLoad(load+1);
 	};
 
 	if(!loaded){
@@ -110,7 +110,7 @@ export function CategoryItem({cat,refresh,picker,onDel,onEdit,onAddTask,onEditTa
 				</PlanlyView>
 				{open?
 					<PlanlyView style={styles.taskContainer}>
-						{tasks.current.map(task=><TaskItem task={task} picker={picker} items={picker?null:items} onEdit={picker?null:onEditTask} onDel={picker?null:onDelTask} onFlip={onTaskFlip} onUp={upTask} onDown={downTask} key={task.id} />)}
+						{tasks.current.map(task=><TaskItem task={task} picker={picker} pick={onPick} items={picker?null:items} onEdit={picker?null:onEditTask} onDel={picker?null:onDelTask} onFlip={onTaskFlip} onDown={downTask} last={last.current===task.id} key={task.id} />)}
 					</PlanlyView>
 				:null}
 				{open?<TapButton icon='up' action={()=>setOpen(false)} />:<TapButton icon='down' action={()=>setOpen(true)} />}

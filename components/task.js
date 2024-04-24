@@ -1,6 +1,5 @@
 import { Pressable, Image, StyleSheet } from "react-native";
-import { GestureDetector, Gesture, Directions } from "react-native-gesture-handler";
-import { useContext, useState, useMemo } from "react";
+import { useContext, useState, useMemo, useEffect } from "react";
 
 import { themeColors } from "../utils/colors";
 import { getColor } from "../utils/functions";
@@ -11,7 +10,7 @@ import { BodyText, PlanlyView, PlanlyModal } from "./basics";
 import { TapButton } from "./buttons";
 import { ViewTask, EditTask, Warning } from "./modals";
 
-export function TaskItem ({task,picker,plan=false,pick=()=>{},items={},onEdit=()=>{},onDel=()=>{},onFlip=()=>{},onUp=()=>{},onDown=()=>{}}){
+export function TaskItem ({task,picker,last=false,plan=false,pick=()=>{},items={},onEdit=()=>{},onDel=()=>{},onFlip=()=>{},onDown=()=>{}}){
 	/*
 		displays a task
 
@@ -31,24 +30,11 @@ export function TaskItem ({task,picker,plan=false,pick=()=>{},items={},onEdit=()
 
 	const [done,setDone] = useState(task.done);
 	const [title,setTitle] = useState(task.title);
+	const [note,setNote] = useState(task.note);
 
 	const [view,setView] = useState(false);
 	const [edit,setEdit] = useState(false);
 	const [warn,setWarn] = useState(false);
-
-	const gestures = useMemo(()=>{
-		const up = Gesture.Fling().direction(Directions.UP).onStart(()=>{
-			if(!done){
-				onUp(task.id,task.rank);
-			}
-		});
-		const down = Gesture.Fling().direction(Directions.DOWN).onStart(()=>{
-			if(!done){
-				onDown(task.id,task.rank);
-			}
-		});
-		return Gesture.Exclusive(up,down);
-	});
 
 	const flipDone = async()=>{
 		// flips the done state of the task
@@ -70,6 +56,13 @@ export function TaskItem ({task,picker,plan=false,pick=()=>{},items={},onEdit=()
 			onEdit(task.id,1);
 		}
 	};
+	const editFromPlan = (title,note,catid) => {
+		task.updateTask(title,note,catid);
+		setTitle(title);
+		setNote(note);
+		setEdit(false);
+		onEdit(task.id);
+	};
 	const editFromView = () => {
 		// launches editing from view modal
 		setView(false);
@@ -81,22 +74,32 @@ export function TaskItem ({task,picker,plan=false,pick=()=>{},items={},onEdit=()
 		setWarn(false);
 	};
 
-	if(plan) {} else if(!(picker && done)) {
+	if(plan) {
+		return (
+			<PlanlyView>
+				<PlanlyView style={styles.plannedRow}>
+					<TapButton icon={done?'checkbox':'box'} action={flipDone} />
+					<PlanlyView style={styles.plannedDetails}>
+						<BodyText style={styles.plannedLabel}>{title}</BodyText>
+						<BodyText style={styles.plannedNote}>{note}</BodyText>
+					</PlanlyView>
+					<TapButton icon='edit' action={()=>setEdit(true)} />
+					<TapButton icon='remove' action={()=>onDel(task.id)} />
+				</PlanlyView>
+				<PlanlyModal show={edit} setShow={setEdit}>
+					<EditTask task={task} action={editFromPlan} items={items} />
+				</PlanlyModal>
+			</PlanlyView>
+		);
+	} else if(!(picker && done)) {
 		return (
 			<PlanlyView style={{width: '100%'}}>
 				<PlanlyView style={styles.row}>
-					{picker?null:
-						<GestureDetector gesture={gestures}>
-							<PlanlyView style={styles.gdetect}>
-								<Image 
-									source={require('../assets/icons/move-light.png')} 
-									tintColor={done?themeColors.gray:themeColors[color]} 
-									style={styles.img} 
-								/>
-							</PlanlyView>
-						</GestureDetector>
+					{picker || done ||last ?
+						<PlanlyView style={styles.img} />:
+						<TapButton icon='down' action={()=>onDown(task.id,task.rank)} />
 					}
-					<Pressable style={styles.label} onPress={picker?pick:flipDone}>
+					<Pressable style={styles.label} onPress={picker?()=>pick(task.id):flipDone}>
 						<BodyText 
 							style={done?{...styles.labelDone,textDecorationColor: themeColors[color]}:null}
 						>
@@ -149,5 +152,26 @@ const styles = StyleSheet.create({
 	img: {
 		width: 20,
 		height: 20,
-	}
+	},
+	plannedRow: {
+		display: 'flex',
+		flexDirection: 'row',
+		gap: 20,
+		alignItems: 'flex-start',
+	},
+	plannedDetails: {
+		display: 'flex',
+		flexGrow: 1,
+		flexShrink: 1,
+		alignContent: 'stretch',
+		flexDirection: 'column',
+		alignItems: 'stretch',
+		justifyContent: 'flex-start',
+	},
+	plannedLabel: {
+		height: 20,
+	},
+	plannedNote: {
+		color: themeColors.gray,
+	},
 });

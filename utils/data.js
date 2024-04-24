@@ -109,6 +109,7 @@ export class Categories {
 				}
 			});
 		});
+		return res.insertId;
 	}
 	async removeTask(tid) {
 		// removes task from database and respective category
@@ -226,9 +227,9 @@ class Task {
 	}
 }
 
-class Date {
+export class Date {
 	// object representing a date
-	constructor(day='',month='',year='',weekday=''){
+	constructor(day='',month='',year='',weekday=-1){
 		this.day = day;
 		this.month = month;
 		this.year = year;
@@ -265,6 +266,40 @@ export class  Current {
 			gratitude: JSON.stringify(this.gratitude),
 			tasks: JSON.stringify(this.tasks),
 		});
+	}
+	save(){
+		SecureStore.setItem('current',this.stringify());
+	}
+	async archive(){
+		let tasks = [];
+		const db = sqlite.openDatabase('main');
+		const ts = await db.execAsync(this.tasks.map(tid=>{
+			return {sql: 'SELECT title,done FROM task WHERE rowid=?',args: [tid]};
+		}),true);
+		ts.forEach(t=>{
+			if(t.rows){
+				tasks.push({
+					title: t.rows[0].title,
+					done: Boolean(t.rows[0].done),
+				});
+			}
+		});
+		const [res] = await db.execAsync([
+			{
+				sql:'INSERT INTO archived(date,gratitude,tasks) VALUES(?,?,?)',
+				args:[
+					this.date.stringify(),
+					JSON.stringify(this.gratitude),
+					JSON.stringify(tasks),
+				]
+			},
+		],false);
+		db.closeAsync();
+		this.date = new Date();
+		this.gratitude = ['','',''];
+		this.tasks = [];
+		SecureStore.setItem('current',this.stringify());
+		return res.insertId;
 	}
 }
 

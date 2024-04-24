@@ -47,7 +47,7 @@ export function NewCategory({action}){
 	return (
 		<PlanlyView style={styles.modal}>
 			<TitleText style={{textAlign: 'center'}}>{newCatModal.title[lang]}</TitleText>
-			<PlanlyTextInput placeholder={newCatModal.placeholder[lang]} value={title} onChangeText={setTitle} autoFocus={true} />
+			<PlanlyTextInput placeholder={newCatModal.placeholder[lang]} value={title} onChangeText={setTitle} autoFocus={true} autoCapitalize='words' />
 			<PlanlyView>
 				<LabelText style={{paddingBottom:8}}>{newCatModal.color[lang]}</LabelText>
 				<PlanlyView style={styles.colorView}>
@@ -75,7 +75,7 @@ export function EditCategory({action,cat}){
 	return (
 		<PlanlyView style={styles.modal}>
 			<TitleText style={{textAlign: 'center'}}>{editCatModal.title[lang]}</TitleText>
-			<PlanlyTextInput placeholder={editCatModal.placeholder[lang]} value={title} onChangeText={setTitle} />
+			<PlanlyTextInput placeholder={editCatModal.placeholder[lang]} value={title} onChangeText={setTitle} autoCapitalize='words' />
 			<PlanlyView>
 				<LabelText style={{paddingBottom:8}}>{editCatModal.color[lang]}</LabelText>
 				<PlanlyView style={styles.colorView}>
@@ -110,7 +110,7 @@ export function NewTask({action,catid,items}){
 	return (
 		<PlanlyView style={styles.modal}>
 			<TitleText>{newTaskModal.title[lang]}</TitleText>
-			<PlanlyTextInput placeholder={newTaskModal.task[lang]} value={title} onChangeText={setTitle} autoFocus={true} />
+			<PlanlyTextInput placeholder={newTaskModal.task[lang]} value={title} onChangeText={setTitle} autoFocus={true} autoCapitalize='words' />
 			<PlanlyTextInput placeholder={newTaskModal.note[lang]} value={note} onChangeText={setNote} multiline={true} />
 			<PlanlyView>
 				<LabelText style={{paddingBottom:8}}>{newTaskModal.category[lang]}</LabelText>
@@ -141,7 +141,7 @@ export function EditTask({task,action,items}){
 	return (
 		<PlanlyView style={styles.modal}>
 			<TitleText>{editTaskModal.title[lang]}</TitleText>
-			<PlanlyTextInput placeholder={editTaskModal.task[lang]} value={title} onChangeText={setTitle} />
+			<PlanlyTextInput placeholder={editTaskModal.task[lang]} value={title} onChangeText={setTitle} autoCapitalize='words' />
 			<PlanlyTextInput placeholder={editTaskModal.note[lang]} value={note} onChangeText={setNote} multiline={true} />
 			<PlanlyView>
 				<LabelText style={{paddingBottom:8}}>{editTaskModal.category[lang]}</LabelText>
@@ -209,6 +209,18 @@ export function Warning({message,labels=[],actions=[]}){
 	);
 }
 
+export function VisionEditor({value,placeholder,buttonLabel,action}){
+
+	const [input,setInput] = useState(value);
+
+	return (
+		<PlanlyView style={styles.visionEditor}>
+			<PlanlyTextInput value={input} onChangeText={setInput} placeholder={placeholder} multiline={true} style={{width: '100%'}} autoFocus={true} />
+			<TextButton label={buttonLabel} action={()=>action(input)} />
+		</PlanlyView>
+	);
+}
+
 const styles = StyleSheet.create({
 	modal: {
 		width: 252,
@@ -253,5 +265,14 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		gap: 20,
 		justifyContent: 'flex-start',
+	},
+	visionEditor: {
+		width: '100%',
+		display: 'flex',
+		flexDirection: 'column',
+		justifyContent: 'flex-end',
+		alignItems: 'flex-start',
+		gap: 32,
+		paddingHorizontal: 32,
 	},
 });

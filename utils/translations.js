@@ -131,3 +131,75 @@ export const delTaskWarning = {
 		],
 	}
 };
+
+export const vision = {
+	goalPlaceHolder: {
+		en: 'Write down your goal...',
+		fa: 'هدف خود را یادداشت کن...',
+	},
+	whyPlaceHolder: {
+		en: 'Write down your reason...',
+		fa: 'انگیزه‌ی خود را یادداشت کن...',
+	},
+	modalButton: {
+		en: 'Save',
+		fa: 'ذخیره',
+	},
+};
+
+export const dateView = {
+	day: {
+		en: 'day',
+		fa: 'روز',
+	},
+	month: {
+		en: 'month',
+		fa: 'ماه',
+	},
+	year: {
+		en: 'year',
+		fa: 'سال',
+	},
+	weekDay: {
+		en: 'week day',
+		fa: 'روز هفته',
+	},
+};
+export const weekDays = {
+	en: ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+	fa: ['یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنجشنبه','جمعه','شنبه'],
+};
+
+export const archiveWarning = {
+	msg: {
+		en: 'You are about to archive the current day, after which you will not be able to make any edits. Do you want to continue?',
+		fa: 'شما در حال آرشیو روز کنونی هستید. پس از این اقدام قادر به ویرایش این روز نخواهید بود. آیا می‌خواهید ادامه دهید؟',
+	},
+	labels: {
+		en: [
+			'Go Back',
+			'Continue'
+		],
+		fa: [
+			'برگرد',
+			'ادامه'
+		],
+	}
+};
+
+export const gratsLabel = {
+	en: 'Today, I am grateful for:',
+	fa: 'امروز، شکرگزار هستم برای:',
+};
+export const tasksLabel = {
+	en: 'Today, I want to do:',
+	fa: 'امروز، می‌خواهم انجام دهم:',
+};
+export const noTasks = {
+	en: 'Nothing Planned Yet...',
+	fa: 'هنوز کاری برنامه‌ریزی نشده است...',
+};
+export const addTaskButton = {
+	en: 'Plan More Tasks',
+	fa: 'برنامه‌ریزی کارهای بیشتر',
+};

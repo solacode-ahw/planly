@@ -1,4 +1,3 @@
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useEffect, useState } from "react";
 
 import { HoverButton } from "../components/buttons";
@@ -42,6 +41,8 @@ export default function List({setTDel,setTEdit,nTask,curT,data}){
 		if(tids.filter((tid)=>current.tasks.includes(tid)).length){
 			setTDel(tids[0]);
 		}
+		current.tasks = current.tasks.filter(tid=>!tids.includes(tid));
+		current.save();
 		setCat(cat+1);
 	};
 	const addTask = async(title,note,catid) => {
@@ -61,12 +62,17 @@ export default function List({setTDel,setTEdit,nTask,curT,data}){
 	};
 	const delTask = async(tid) => {
 		// callback to delete a task
+		if(current.tasks.includes(tid)){
+			current.tasks = current.tasks.filter(t=>t!=tid);
+			current.save();
+			setTDel(tid);
+		}
 		await cats.removeTask(tid);
 		setCat(cat+1);
 	};
 
 	return (
-		<GestureHandlerRootView><PlanlyScreen>
+		<PlanlyScreen>
 			<PlanlyScroll padded={true}>
 				{Object.values(cats.categories).flat().map(category=><CategoryItem cat={category} refresh={cat} picker={false} onDel={delCat} onEdit={editCat} items={cats.items()} onAddTask={addTask} onEditTask={editTask} onDelTask={delTask} key={category.id} />)}
 			</PlanlyScroll>
@@ -74,6 +80,6 @@ export default function List({setTDel,setTEdit,nTask,curT,data}){
 			<PlanlyModal show={catModal} setShow={setCatModal}>
 				<NewCategory action={addCat} />
 			</PlanlyModal>
-		</PlanlyScreen></GestureHandlerRootView>
+		</PlanlyScreen>
 	);
 }

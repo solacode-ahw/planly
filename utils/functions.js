@@ -1,5 +1,7 @@
 import { Appearance } from 'react-native';
 
+import { weekDays } from './translations';
+
 
 export function getTheme(thm){
 	if(thm === 'auto'){
@@ -13,4 +15,12 @@ export function getColor(thm){
 		color = Appearance.getColorScheme() === 'dark' ? 'light' : 'dark';
 	}
 	return color;
+}
+
+export function getWeekDays(lang){
+	let res = {};
+	[...Array(7).keys()].forEach(i=>{
+		res[i] = weekDays[lang][i];
+	});
+	return res;
 }

@@ -1,5 +1,5 @@
 import { ScrollView,View, Text, TextInput, Modal, Pressable, Image, StyleSheet } from "react-native";
-import { useContext, useState, useRef } from "react";
+import { useContext, useState, useRef, useEffect } from "react";
 
 import { getTheme, getColor } from "../utils/functions";
 import { themeColors } from "../utils/colors";
@@ -31,13 +31,13 @@ export function PlanlyView({transparent=true,style={},...props}){
 	);
 }
 
-export function PlanlyModal({show,setShow,children}){
+export function PlanlyModal({show,setShow,children,height='auto'}){
 	const theme = getTheme(useContext(SettingsContext).thm);
 	const color = getColor(theme);
 
 	return (
 		<Modal animationType="slide" transparent={true} visible={show} onRequestClose={()=>setShow(false)}>
-			<PlanlyView style={styles.modalOut}><PlanlyView transparent={false} style={{...styles.modalIn,shadowColor:themeColors[color]}}>
+			<PlanlyView style={styles.modalOut}><PlanlyView transparent={false} style={{...styles.modalIn,shadowColor:themeColors[color],height:height}}>
 				{children}
 			</PlanlyView></PlanlyView>
 		</Modal>
@@ -79,7 +79,7 @@ export function PlanlyTextInput({style,...props}){
 	);
 }
 
-export function DropDown({items,action,width,initial='',label='',direction='down'}){
+export function DropDown({items,action,width,initial='',label='',direction='down',refresh=0}){
 	/*
 		items: an object with items as id:'value' to view in the dropdown menu
 		action: callback to call when value changes
@@ -96,6 +96,10 @@ export function DropDown({items,action,width,initial='',label='',direction='down
 
 	const [pose,setPose] = useState(StyleSheet.create({}));
 	const elemRef = useRef(null);
+
+	useEffect(()=>{
+		setValue(initial);
+	},[refresh]);
 
 	const expand = ()=>{
 		let n = Object.keys(items).length;
@@ -119,22 +123,30 @@ export function DropDown({items,action,width,initial='',label='',direction='down
 
 	return (
 		<View>
-			<Pressable onPress={expand} style={{...styles.dropClose,borderColor:themeColors[color]}} ref={elemRef}>
+			<Pressable onPress={expand} style={{...styles.dropClose,borderColor:themeColors[color],width:width}} ref={elemRef}>
 				<BodyText style={value?{}:{color:themeColors.gray}}>{value!==''?items[value]:label}</BodyText>
 				<Image source={require('../assets/icons/drop-fill.png')} tintColor={themeColors[color]} style={{width:12,height:12}} />
 			</Pressable>
 			<Modal transparent={true} visible={open} animationType="fade" onRequestClose={()=>setOpen(false)}>
 				<View><PlanlyView transparent={false} style={{...pose,shadowColor:themeColors[color],...styles.dropOpen,width:width}}>
+					{direction!=='down'?null:
+						<Pressable onPress={()=>setOpen(false)} style={styles.dropTop}>
+							<BodyText style={value?{}:{color:themeColors.gray}}>{value?items[value]:label}</BodyText>
+							<Image source={require('../assets/icons/dropup-fill.png')} tintColor={themeColors[color]} style={{width:12,height:12}} />
+						</Pressable>
+					}
 					{Object.keys(items).map(key=>
 						key==value?null:
 							<Pressable onPress={()=>pick(key)} style={styles.dropItem} key={key}>
 								<BodyText>{items[key]}</BodyText>
 							</Pressable>
 					)}
-					<Pressable onPress={()=>setOpen(false)} style={styles.dropTop}>
-						<BodyText style={value?{}:{color:themeColors.gray}}>{value?items[value]:label}</BodyText>
-						<Image source={direction==='down'?require('../assets/icons/dropup-fill.png'):require('../assets/icons/drop-fill.png')} tintColor={themeColors[color]} style={{width:12,height:12}} />
-					</Pressable>
+					{direction==='down'?null:
+						<Pressable onPress={()=>setOpen(false)} style={styles.dropTop}>
+							<BodyText style={value?{}:{color:themeColors.gray}}>{value?items[value]:label}</BodyText>
+							<Image source={require('../assets/icons/drop-fill.png')} tintColor={themeColors[color]} style={{width:12,height:12}} />
+						</Pressable>
+					}
 				</PlanlyView></View>
 			</Modal>
 		</View>
@@ -163,8 +175,9 @@ const styles = StyleSheet.create({
 		paddingVertical: 32,
 		width: '100%',
 		display: 'flex',
+		flexDirection: 'column',
 		alignItems: 'center',
-		justifyContent: 'center',
+		justifyContent: 'flex-start',
 		borderTopRightRadius: 32,
 		borderTopLeftRadius: 32,
 		elevation: 16,
@@ -172,18 +185,25 @@ const styles = StyleSheet.create({
 	textInput: {
 		borderBottomWidth: 1,
 		padding: 8,
+		textAlign: 'justify',
 	},
 	body: {
 		fontFamily: 'BornaRegular',
 		fontSize: 14,
+		lineHeight: 24,
+		textAlign: 'justify',
 	},
 	label: {
 		fontFamily: 'BornaBold',
 		fontSize: 14,
+		lineHeight: 24,
+		textAlign: 'justify',
 	},
 	title: {
 		fontFamily: 'BornaBold',
 		fontSize: 16,
+		lineHeight: 26,
+		textAlign: 'justify',
 	},
 	dropClose: {
 		display: 'flex',
