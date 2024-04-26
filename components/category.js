@@ -1,7 +1,7 @@
 import { Image, StyleSheet } from "react-native";
 import { useState, useContext, useEffect, useRef } from "react";
 
-import { categoryColors } from "../utils/colors";
+import { categoryColors, themeColors } from "../utils/colors";
 import { getColor } from "../utils/functions";
 import { SettingsContext } from "../utils/hooks";
 import { delCatWarning } from "../utils/translations";
@@ -100,7 +100,7 @@ export function CategoryItem({cat,refresh,picker,onDel,onEdit,onAddTask,onEditTa
 		return null;
 	} else {
 		return (
-			<PlanlyView transparent={false} style={{...styles.card,shadowColor:categoryColors[color]}}>
+			<PlanlyView transparent={false} style={{...styles.card,shadowColor:themeColors[color]}}>
 				<PlanlyView style={styles.row}>
 					<Image style={styles.mark} tintColor={categoryColors[cat.color]} source={require('../assets/icons/mark-fill.png')} />
 					<LabelText style={styles.label}>{cat.title}</LabelText>
