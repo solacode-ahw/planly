@@ -3,7 +3,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 
 import { SettingsContext } from "../utils/hooks";
 import { categoryColors } from "../utils/colors";
-import { newCatModal, editCatModal, newTaskModal, editTaskModal, viewTaskModal } from "../utils/translations";
+import { newCatModal, editCatModal, newTaskModal, editTaskModal, viewTaskModal, archiveViewLabels } from "../utils/translations";
 import { getCat } from "../utils/data";
 
 import { PlanlyTextInput, LabelText, TitleText, PlanlyView, BodyText, DropDown } from "./basics";
@@ -191,10 +191,33 @@ export function ViewTask({task,back,onEdit}){
 					<Image source={require('../assets/icons/mark-fill.png')} tintColor={categoryColors[cat.current.color]} style={{width:20,height:20}} />
 					<BodyText>{cat.current.title}</BodyText>
 				</PlanlyView>
-				<TapButton icon='down' action={back} style={{alignSelf: 'center'}} />
+				<TapButton icon='down' action={back} style={styles.center} />
 			</PlanlyView>
 		);
 	}
+}
+
+export function ViewArchive({date,grats,tasks,back}){
+	const lang = useContext(SettingsContext).lang;
+
+	return (
+		<PlanlyView style={styles.modal}>
+			<LabelText style={styles.center}>{date}</LabelText>
+			<PlanlyView style={styles.block}>
+				<LabelText>{archiveViewLabels.grats[lang]}</LabelText>
+				<BodyText>{`1. ${grats[0]}`}</BodyText>
+				<BodyText>{`2. ${grats[1]}`}</BodyText>
+				<BodyText>{`3. ${grats[2]}`}</BodyText>
+			</PlanlyView>
+			<PlanlyView style={styles.block}>
+				<LabelText>{archiveViewLabels.tasks[lang]}</LabelText>
+				{tasks.map(task=>
+					<BodyText style={task.done?styles.stroked:styles.normal} key={tasks.indexOf(task)}>{task.title}</BodyText>
+				)}
+			</PlanlyView>
+			<TapButton icon='down' action={back} style={styles.center} />
+		</PlanlyView>
+	);
 }
 
 export function Warning({message,labels=[],actions=[]}){
@@ -275,4 +298,19 @@ const styles = StyleSheet.create({
 		gap: 32,
 		paddingHorizontal: 32,
 	},
+	stroked: {
+		textDecorationLine: 'line-through',
+		paddingStart: 20,
+	},
+	normal: {
+		paddingStart: 20,
+	},
+	center: {
+		alignSelf: 'center',
+	},
+	block: {
+		display: 'flex',
+		flexDirection: 'column',
+		gap: 16,
+	}
 });

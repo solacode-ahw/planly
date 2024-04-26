@@ -203,3 +203,32 @@ export const addTaskButton = {
 	en: 'Plan More Tasks',
 	fa: 'برنامه‌ریزی کارهای بیشتر',
 };
+
+export const archiveRemoveWarning = {
+	message: {
+		en: 'You are about to remove this archived plan. This action is not reversible. Are you sure?',
+		fa: 'شما در حال حذف این آرشیو هستید. این عمل غیرقابل بازگشت است. آیا می‌خواهید ادامه بدهید؟',
+	},
+	labels: {
+		en: ['Go Back','Continue'],
+		fa: ['برگرد','ادامه'],
+	},
+};
+export const archiveDate = {
+	en: 'No Date',
+	fa: 'بدون تاریخ',
+};
+export const noArchive = {
+	en: 'No Plan Has Been Archived Yet...',
+	fa: 'هیچ آرشیوی وجود ندارد...',
+};
+export const archiveViewLabels = {
+	grats: {
+		en: 'I was grateful for:',
+		fa: 'شکرگزار بودم برای:',
+	},
+	tasks: {
+		en: 'I wanted to do:',
+		fa: 'می‌خواستم انجام دهم',
+	},
+};

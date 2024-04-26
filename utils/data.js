@@ -243,6 +243,21 @@ export class Date {
 			weekday: this.weekday,
 		});
 	}
+	display(ds,weekdays,ifEmpty=''){
+		// mode=1 for dmy - mode=2 for mdy
+		if(!this.day && !this.month && !this.year){
+			if(this.weekday===-1){
+				return ifEmpty;
+			} else {
+				return weekdays[this.weekday];
+			}
+		}
+		if(ds==='intl'){
+			return `${this.day} ${this.month} ${this.year} ${this.weekday===-1?'':'- '+weekdays[this.weekday]}`;
+		} else {
+			return `${this.month} ${this.day} ${this.year} ${this.weekday===-1?'':'- '+weekdays[this.weekday]}`;
+		}
+	}
 }
 export class  Current {
 	// object representing the current plan
@@ -303,6 +318,15 @@ export class  Current {
 	}
 }
 
+class Archived {
+	constructor(id,date,gratitude,tasks){
+		this.id = id;
+		this.date = new Date(...Object.values(JSON.parse(date)));
+		this.gratitude = JSON.parse(gratitude);
+		this.tasks = JSON.parse(tasks);
+	}
+}
+
 export async function initDB(){
 	// initializes database tables
 	const db = sqlite.openDatabase('main');
@@ -340,4 +364,20 @@ export async function getCat(id){
 	} else {
 		return null;
 	}
+}
+
+export async function getArchived(){
+	const db = sqlite.openDatabase('main');
+	const [res] = await db.execAsync([
+		{sql:'SELECT rowid,date,gratitude,tasks FROM archived ORDER BY rowid DESC',args:[]},
+	],true);
+	db.closeAsync();
+	return res.rows.map(row=>new Archived(...Object.values(row)));
+}
+export async function deleteArchived(id){
+	const db = sqlite.openDatabase('main');
+	await db.execAsync([
+		{sql:'DELETE FROM archived WHERE rowid=?',args:[id]}
+	],false);
+	db.closeAsync();
 }
