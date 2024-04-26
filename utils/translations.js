@@ -232,3 +232,46 @@ export const archiveViewLabels = {
 		fa: 'می‌خواستم انجام دهم',
 	},
 };
+
+export const settingsLabels = {
+	thm: {
+		en: {
+			title: 'Theme',
+			options: ['Auto','Dark','Light'],
+		},
+		fa: {
+			title: 'تم',
+			options: ['خودکار','تیره','روشن'],
+		},
+	},
+	lang: {
+		en: {
+			title: 'Language',
+			options: ['English','فارسی'],
+		},
+		fa: {
+			title: 'زبان',
+			options: ['English','فارسی'],
+		},
+	},
+	ds: {
+		en: {
+			title: 'Date Style',
+			options: ['International','American'],
+		},
+		fa: {
+			title: 'نحوه نمایش تاریخ',
+			options: ['بین‌المللی','آمریکایی'],
+		},
+	},
+	ws: {
+		en: {
+			title: 'Start of the Week',
+			options: ['Saturday','Sunday','Monday'],
+		},
+		fa: {
+			title: 'شروع هفته',
+			options: ['شنبه','یکشنبه','دوشنبه'],
+		},
+	},
+};
