@@ -17,10 +17,10 @@ export function getColor(thm){
 	return color;
 }
 
-export function getWeekDays(lang){
+export function getWeekDays(ws,lang){
 	let res = {};
 	[...Array(7).keys()].forEach(i=>{
-		res[i] = weekDays[lang][i];
+		res[i] = weekDays[lang][(ws+i)%7];
 	});
 	return res;
 }

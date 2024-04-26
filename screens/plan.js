@@ -16,6 +16,8 @@ import { TaskItem } from "../components/task";
 
 export default function Plan({tDel,tEdit,setCur,setNTask,setCurT,data}){
 	const lang = useContext(SettingsContext).lang;
+	const ws = useContext(SettingsContext).ws;
+	const ds = useContext(SettingsContext).ds;
 	const current = data.current;
 
 	const [day,setDay] = useState(current.date.day);
@@ -64,7 +66,7 @@ export default function Plan({tDel,tEdit,setCur,setNTask,setCurT,data}){
 		current.save();
 	};
 	const saveWeekDay = (wd)=>{
-		current.date.weekday = wd;
+		current.date.weekday = (Number(wd)+ws)%7;
 		current.save();
 	};
 
@@ -109,10 +111,16 @@ export default function Plan({tDel,tEdit,setCur,setNTask,setCurT,data}){
 				<VisionBoard />
 
 				<PlanlyView style={styles.dateRow}>
-					<PlanlyTextInput placeholder={dateView.day[lang]} autoCapitalize='none' value={day} onChangeText={setDay} onEndEditing={saveDay} style={styles.dateInput} />
-					<PlanlyTextInput placeholder={dateView.month[lang]} autoCapitalize='none' value={month} onChangeText={setMonth} onEndEditing={saveMonth} style={styles.dateInput} />
+					{ds==='intl'?
+						<PlanlyTextInput placeholder={dateView.day[lang]} autoCapitalize='none' value={day} onChangeText={setDay} onEndEditing={saveDay} style={styles.dateInput} />
+						:<PlanlyTextInput placeholder={dateView.month[lang]} autoCapitalize='none' value={month} onChangeText={setMonth} onEndEditing={saveMonth} style={styles.dateInput} />
+					}
+					{ds!=='intl'?
+						<PlanlyTextInput placeholder={dateView.day[lang]} autoCapitalize='none' value={day} onChangeText={setDay} onEndEditing={saveDay} style={styles.dateInput} />
+						:<PlanlyTextInput placeholder={dateView.month[lang]} autoCapitalize='none' value={month} onChangeText={setMonth} onEndEditing={saveMonth} style={styles.dateInput} />
+					}
 					<PlanlyTextInput placeholder={dateView.year[lang]} autoCapitalize='none' value={year} onChangeText={setYear} onEndEditing={saveYear} style={styles.dateInput} />
-					<DropDown items={getWeekDays(lang)} action={saveWeekDay} width={125} initial={current.date.weekday===-1?'':current.date.weekday} label={dateView.weekDay[lang]} refresh={refresh} />
+					<DropDown items={getWeekDays(ws,lang)} action={saveWeekDay} width={125} initial={current.date.weekday===-1?'':current.date.weekday} label={dateView.weekDay[lang]} refresh={refresh} />
 				</PlanlyView>
 
 				<PlanlyView style={styles.itemBlock}>
