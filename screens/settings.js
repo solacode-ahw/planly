@@ -1,12 +1,13 @@
 import { Pressable, Image, StyleSheet } from "react-native";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 
 import { settingsLabels } from "../utils/translations";
 import { getColor } from "../utils/functions";
 import { SettingsContext } from "../utils/hooks";
 import { themeColors } from "../utils/colors";
 
-import { BodyText, LabelText, PlanlyScreen, PlanlyScroll, PlanlyView } from "../components/basics";
+import { BodyText, LabelText, PlanlyModal, PlanlyScreen, PlanlyScroll, PlanlyView } from "../components/basics";
+import { Warning } from "../components/modals";
 
 
 function SettingOption({img,label,selected,onSelect,value,tinted=true}){
@@ -43,18 +44,28 @@ function SettingItem({type,onChange}){
 
     const current = useContext(SettingsContext)[type];
 
+    const [inst,setInst] = useState(false);
+
     const change = (value)=>{
         onChange(type,value);
+        if(type==='lang'){
+            setInst(true);
+        }
     };
 
     return (
-        <PlanlyView style={{...styles.block,shadowColor:themeColors[color]}} transparent={false}>
-            <LabelText>{settingsLabels[type][lang].title}</LabelText>
-            <PlanlyView style={styles.row}>
-                {[...Array(settingsAssets[type].values.length).keys()].map(i=>
-                    <SettingOption img={settingsAssets[type].icons[i]} label={settingsLabels[type][lang].options[i]} selected={current===settingsAssets[type].values[i]} value={settingsAssets[type].values[i]} onSelect={change} tinted={type!=='thm'} key={i} />
-                )}
+        <PlanlyView>
+            <PlanlyView style={{...styles.block,shadowColor:themeColors[color]}} transparent={false}>
+                <LabelText>{settingsLabels[type][lang].title}</LabelText>
+                <PlanlyView style={styles.row}>
+                    {[...Array(settingsAssets[type].values.length).keys()].map(i=>
+                        <SettingOption img={settingsAssets[type].icons[i]} label={settingsLabels[type][lang].options[i]} selected={current===settingsAssets[type].values[i]} value={settingsAssets[type].values[i]} onSelect={change} tinted={type!=='thm'} key={i} />
+                    )}
+                </PlanlyView>
             </PlanlyView>
+            <PlanlyModal show={inst} setShow={setInst}>
+                <Warning message={settingsLabels.langWarn.label[lang]} labels={settingsLabels.langWarn.button[lang]} actions={[()=>setInst(false)]} />
+            </PlanlyModal>
         </PlanlyView>
     );
 }

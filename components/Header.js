@@ -47,6 +47,7 @@ const styles = StyleSheet.create({
 		color: themeColors.primary.original,
 		fontSize: 20,
 		fontFamily: 'BornaBold',
+		textAlign: 'justify',
 	},
 	button: {
 		width: 24,

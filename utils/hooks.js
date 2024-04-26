@@ -1,4 +1,5 @@
 import * as SecureStore from 'expo-secure-store';
+import { I18nManager } from 'react-native';
 import { createContext } from 'react';
 
 // settings context creation
@@ -24,6 +25,13 @@ export function settingReducer(state,action){
 			return {...state,thm:action.value};
 		case 'lang':
 			SecureStore.setItem('lang',action.value);
+			if(['fa'].includes(action.value)){
+				I18nManager.isRTL = true;
+				I18nManager.forceRTL(true);
+			} else {
+				I18nManager.isRTL = false;
+				I18nManager.forceRTL(false);
+			}
 			return {...state,lang:action.value};
 		case 'ds':
 			SecureStore.setItem('ds',action.value);

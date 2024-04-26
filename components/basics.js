@@ -1,4 +1,4 @@
-import { ScrollView,View, Text, TextInput, Modal, Pressable, Image, StyleSheet } from "react-native";
+import { ScrollView,View, Text, TextInput, Modal, Pressable, Image, StyleSheet, I18nManager, Dimensions } from "react-native";
 import { useContext, useState, useRef, useEffect } from "react";
 
 import { getTheme, getColor } from "../utils/functions";
@@ -66,7 +66,7 @@ export function TitleText({style,...props}){
 	);
 }
 
-export function PlanlyTextInput({style,...props}){
+export function PlanlyTextInput({style={},...props}){
 	const theme = getTheme(useContext(SettingsContext).thm);
 	const color = getColor(theme);
 
@@ -74,6 +74,7 @@ export function PlanlyTextInput({style,...props}){
 		<TextInput 
 			style={{...styles.textInput,...styles.body,backgroundColor:themeColors[theme],borderColor:themeColors[color],color:themeColors[color],...style}} 
 			cursorColor={themeColors.accent.original} selectionColor={themeColors.accent.original} 
+			textAlign={style.textAlign?style.textAlign:(I18nManager.isRTL?'right':'left')}
 			placeholderTextColor={themeColors.gray} {...props}
 		/>
 	);
@@ -108,9 +109,9 @@ export function DropDown({items,action,width,initial='',label='',direction='down
 		}
 		elemRef.current.measure((x,y,width,height,pageX,pageY)=>{
 			if(direction=='down'){
-				setPose(StyleSheet.create({left:pageX,top:pageY}));
+				setPose(StyleSheet.create({start:I18nManager.isRTL?(Dimensions.get('window').width-pageX-width):pageX,top:pageY}));
 			} else {
-				setPose(StyleSheet.create({left:pageX,top:pageY-(n*height)}));
+				setPose(StyleSheet.create({start:I18nManager.isRTL?(Dimensions.get('window').width-pageX-width):pageX,top:pageY-(n*height)}));
 			}
 		});
 		setOpen(true);

@@ -274,4 +274,14 @@ export const settingsLabels = {
 			options: ['شنبه','یکشنبه','دوشنبه'],
 		},
 	},
+	langWarn: {
+		label: {
+			en: 'To complete the change, you need to restart the app.',
+			fa: 'برای اعمال تغییرات لازم است که اپلیکیشن را ریست کنید.',
+		},
+		button: {
+			en: ['OK'],
+			fa: ['باشه'],
+		}
+	},
 };

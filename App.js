@@ -86,6 +86,7 @@ export default function App() {
 	});
 
 	useEffect(()=>{
+		setLoaded(false);
 		// reading setting values from device and applying them
 		let val = SecureStore.getItem('thm');
 		if(val!='auto'){
