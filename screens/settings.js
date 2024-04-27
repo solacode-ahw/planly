@@ -44,47 +44,50 @@ function SettingItem({type,onChange}){
 
     const current = useContext(SettingsContext)[type];
 
-    const [inst,setInst] = useState(false);
+    
 
     const change = (value)=>{
         onChange(type,value);
-        if(type==='lang'){
-            setInst(true);
-        }
     };
 
     return (
-        <PlanlyView>
-            <PlanlyView style={{...styles.block,shadowColor:themeColors[color]}} transparent={false}>
-                <LabelText>{settingsLabels[type][lang].title}</LabelText>
-                <PlanlyView style={styles.row}>
-                    {[...Array(settingsAssets[type].values.length).keys()].map(i=>
-                        <SettingOption img={settingsAssets[type].icons[i]} label={settingsLabels[type][lang].options[i]} selected={current===settingsAssets[type].values[i]} value={settingsAssets[type].values[i]} onSelect={change} tinted={type!=='thm'} key={i} />
-                    )}
-                </PlanlyView>
+        <PlanlyView style={{...styles.block,shadowColor:themeColors[color]}} transparent={false}>
+            <LabelText>{settingsLabels[type][lang].title}</LabelText>
+            <PlanlyView style={styles.row}>
+                {[...Array(settingsAssets[type].values.length).keys()].map(i=>
+                    <SettingOption img={settingsAssets[type].icons[i]} label={settingsLabels[type][lang].options[i]} selected={current===settingsAssets[type].values[i]} value={settingsAssets[type].values[i]} onSelect={change} tinted={type!=='thm'} key={i} />
+                )}
             </PlanlyView>
-            <PlanlyModal show={inst} setShow={setInst}>
-                <Warning message={settingsLabels.langWarn.label[lang]} labels={settingsLabels.langWarn.button[lang]} actions={[()=>setInst(false)]} />
-            </PlanlyModal>
         </PlanlyView>
     );
 }
 
 export default function Settings({dispatch}){
+    const lang = useContext(SettingsContext).lang;
+
+    const [inst,setInst] = useState(false);
 
     const update = (type,value) => {
         dispatch({
             field: type,
             value: value,
         });
+        if(type==='lang'){
+            setInst(true);
+        }
     };
 
     return (
-        <PlanlyScreen><PlanlyScroll>
+        <PlanlyScreen>
+            <PlanlyScroll>
             {Object.keys(settingsAssets).map(type=>
                 <SettingItem type={type} onChange={update} key={type} />
             )}
-        </PlanlyScroll></PlanlyScreen>
+            </PlanlyScroll>
+            <PlanlyModal show={inst} setShow={setInst}>
+                <Warning message={settingsLabels.langWarn.label[lang]} labels={settingsLabels.langWarn.button[lang]} actions={[()=>setInst(false)]} />
+            </PlanlyModal>
+        </PlanlyScreen>
     );
 }
 
