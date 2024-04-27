@@ -5,10 +5,6 @@ It is written with React Native and Expo, made with love by
 
 ![SolaCode](/assets/graphics/logo.png)
 
-_It is currently only available for android!_
-
-<!-- _You can download it from [HERE](https://github.com/solacode-ahw/quick-planner/blob/master/app/QuickPlanner.apk)_ -->
-
 ## Features
 * write these
 
@@ -25,4 +21,4 @@ _It is currently only available for android!_
 * Do you wish to see a feature not listed?
 * Do you want to help with translating the app to another language?
 
-Please feel free to contact me via email at: solacode.ahw [at] gmail [dot] com
+Please feel free to contact me via email at: solacode.ahw [at] proton [dot] me
