@@ -93,6 +93,12 @@ export default function Plan({tDel,tEdit,setCur,setNTask,setCurT,data}){
 
 	const archive = async()=>{
 		setWarn(false);
+		current.date.day = day;
+		current.date.month = month;
+		current.date.year = year;
+		current.gratitude[0] = grat1;
+		current.gratitude[1] = grat2;
+		current.gratitude[2] = grat3;
 		setCur(await current.archive());
 		// clear the page
 		setDay('');
