@@ -5,6 +5,9 @@ It is written with React Native and Expo, made with love by
 
 ![SolaCode](/assets/graphics/logo.png)
 
+## Download
+[DIRECT DOWNLOAD](https://drive.proton.me/urls/H7EV9291ER#jo59xU9LMZbr)
+
 ## Features
 * Helps you to keep your goal, and your reason in your mind.
 * You can group tasks into categories. And categories can be color coded.
