@@ -16,6 +16,7 @@ import Settings from './screens/settings';
 import List from './screens/list';
 import Plan from './screens/plan';
 import Archive from './screens/archive';
+import Tour from './screens/tour';
 
 import Header from './components/Header';
 import TabBar from './components/TabBar';
@@ -84,6 +85,7 @@ export default function App() {
 		'BornaRegular': require('./assets/fonts/BornaRegular.ttf'),
 		'BornaBold': require('./assets/fonts/BornaBold.ttf'),
 	});
+	const [tour,setTour] = useState(true);
 
 	useEffect(()=>{
 		setLoaded(false);
@@ -116,6 +118,12 @@ export default function App() {
 				value: val?Number(val):6,
 			});
 		}
+		// run tour if it's the first time app is running
+		val = SecureStore.getItem('init');
+		if(!val){
+			SecureStore.setItem('init','true');
+			setTour(true);
+		}
 		// database initialization
 		const dbSetup = async() => {
 			await initDB();
@@ -131,12 +139,16 @@ export default function App() {
 		return (
 			<NavigationContainer><SettingsContext.Provider value={settings}>
 				<Stack.Navigator initialRouteName='main' screenOptions={{ header: Header}}>
-					<Stack.Screen name='about' component={About} />
+					<Stack.Screen name='about'>
+						{(props) => <About {...props} setTour={setTour} />}
+					</Stack.Screen>
 					<Stack.Screen name='settings'>
 						{(props) => <Settings {...props} dispatch={dispatch} />}
 					</Stack.Screen>
 					<Stack.Screen name='main' component={Main} />
-			</Stack.Navigator></SettingsContext.Provider></NavigationContainer>
+				</Stack.Navigator>
+				<Tour show={tour} setShow={setTour} />
+			</SettingsContext.Provider></NavigationContainer>
 		);
 	}
 }
