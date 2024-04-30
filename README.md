@@ -1,4 +1,4 @@
-# Planly
+# PLANLY
 write down your tasks, group them in categories and plan which you want to do today; all of that in just a few seconds, easily and intuitively!
 
 It is written with React Native and Expo, made with love by
@@ -6,7 +6,13 @@ It is written with React Native and Expo, made with love by
 ![SolaCode](/assets/graphics/logo.png)
 
 ## Features
-* write these
+* Helps you to keep your goal, and your reason in your mind.
+* You can group tasks into categories. And categories can be color coded.
+* You can write the date in any format you like.
+* Write 3 things you are grateful for, everyday.
+* Add tasks to your daily plan to get them done!
+* Review your past plans if you wish.
+* Supports both English and Farsi.
 
 ## For Best Experience
 * Define short term goals and update it as you move forward. It's best if your goal can be achieved in the next few months.
