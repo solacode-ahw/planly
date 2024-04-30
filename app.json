@@ -21,7 +21,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/graphics/adaptive-icon.png",
         "backgroundColor": "#A8383B"
-      }
+      },
+      "package": "ir.solacode.planly"
     },
     "plugins": [
       "expo-secure-store",
