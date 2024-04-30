@@ -81,6 +81,11 @@ export default function App() {
 		ws: 6,
 	});
 	const [loaded, setLoaded] = useState(false);
+	/*
+		The following fonts are considered proprietary software.
+		To gain information about the laws regarding the use of these fonts, please visit www.fontiran.com
+		This set of fonts are used in this project under the license: (VYLT4F08)
+	*/
 	const [font] = useFonts({
 		'BornaRegular': require('./assets/fonts/BornaRegular.ttf'),
 		'BornaBold': require('./assets/fonts/BornaBold.ttf'),
