@@ -120,4 +120,5 @@ const icons = {
 	'box': require('../assets/icons/box-light.png'),
 	'checkbox': require('../assets/icons/checkbox-light.png'),
 	'remove': require('../assets/icons/remove-light.png'),
+	'copy': require('../assets/icons/copy-light.png'),
 };

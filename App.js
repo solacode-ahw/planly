@@ -85,7 +85,7 @@ export default function App() {
 		'BornaRegular': require('./assets/fonts/BornaRegular.ttf'),
 		'BornaBold': require('./assets/fonts/BornaBold.ttf'),
 	});
-	const [tour,setTour] = useState(true);
+	const [tour,setTour] = useState(false);
 
 	useEffect(()=>{
 		setLoaded(false);

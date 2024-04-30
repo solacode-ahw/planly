@@ -285,3 +285,22 @@ export const settingsLabels = {
 		}
 	},
 };
+
+export const about = {
+	tourButton: {
+		en: 'Play Tour of the App',
+		fa: 'اجرای تور اپلیکیشن',
+	},
+	credit: {
+		en: 'Written with React Native and Expo, by:',
+		fa: 'نوشته‌شده با استفاده از React Native و Expo؛ توسط:',
+	},
+	address: {
+		en: 'To find out more about us, visit the website:',
+		fa: 'برای کسب اطلاعات بیشتر راجع به ما، به وبسایت مراجعه کنید.',
+	},
+	contact: {
+		en: 'To report any issues, contact me via email:',
+		fa: 'برای گزارش مشکلات اپلیکیشن، به ایمیل زیر پیام بفرستید:',
+	},
+};
