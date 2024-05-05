@@ -6,6 +6,7 @@ It is written with React Native and Expo, made with love by
 ![SolaCode](/assets/graphics/logo.png)
 
 ## Download
+### version 1.0.0
 [DIRECT DOWNLOAD](https://drive.proton.me/urls/H7EV9291ER#jo59xU9LMZbr)
 
 ## Features
@@ -21,6 +22,9 @@ It is written with React Native and Expo, made with love by
 * Define short term goals and update it as you move forward. It's best if your goal can be achieved in the next few months.
 * Make sure to write down your why. After all, **He who has a why to live, can bear with almost any How!**
 * Try to write 3 things you are grateful for every day. It doesn't matter how small they are, they can remind you of the positive sides of life; which are usually overlooked!
+
+## Known Issues
+* App closes when trying to add a task from task picker
 
 ## In Future Updates
 * Import/Export
