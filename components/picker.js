@@ -14,7 +14,7 @@ export function Picker({cats, onPick, onAddPick,picks,back}){
 	return (
 		<PlanlyView style={styles.container}>
 			<PlanlyScroll>
-				{Object.values(cats.categories).flat().map(category=><CategoryItem cat={category} picker={true} onPick={onPick} picks={picks} onAddTask={addTask} key={category.id} />)}
+				{Object.values(cats.categories).flat().map(category=><CategoryItem cat={category} picker={true} onPick={onPick} picks={picks} onAddTask={addTask} items={cats.items()} key={category.id} />)}
 			</PlanlyScroll>
 			<TapButton icon='down' action={back} style={styles.backButton} />
 		</PlanlyView>
