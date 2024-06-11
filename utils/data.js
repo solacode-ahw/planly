@@ -6,121 +6,104 @@ import * as SecureStore from 'expo-secure-store';
 export class Categories {
 	constructor(){
 		// categories devided into lists based on their color
-		this.categories = {
-			violet: [],
-			lilac: [],
-			purple: [],
-			blue: [],
-			sky: [],
-			ocean: [],
-			grass: [],
-			green: [],
-			lemon: [],
-			yellow: [],
-			sun: [],
-			orange: [],
-			coral: [],
-			red: [],
-			pink: [],
-		};
+		this.categories = [];
 	}
 	items(){
 		// returns an object of all categories id: 'category title'
 		let itms = {};
-		Object.values(this.categories).forEach(list=>{
-			list.forEach(cat=>{
-				itms[cat.id] = cat.title;
-			});
+		this.categories.forEach(cat=>{
+			itms[cat.id] = cat.title;
 		});
 		return itms;
 	}
 	async getCats(){
 		// reads categories from database and saves the category object for them in categories list
-		Object.keys(this.categories).forEach(k=>{
-			this.categories[k]=[];
-		});
-		db = sqlite.openDatabase('main');
-		const [res] = await db.execAsync([
-			{sql:'SELECT rowid,title,color FROM category',args:[]},
-		],true);
+		this.categories = [];
+		db = sqlite.openDatabaseSync('main');
+		const res = db.getAllSync(
+			'SELECT rowid,title,color,rank FROM category ORDER BY rank'
+		);
 		db.closeAsync();
-		if(res.rows) {
-			for(row of res.rows){
-				this.categories[row.color].push(new Category(row.rowid,row.title,row.color));
-				await this.categories[row.color].at(-1).getTasks();
+		if(res) {
+			for(row of res){
+				this.categories.push(new Category(row.rowid,row.title,row.color,row.rank));
+				await this.categories.at(-1).getTasks();
 			}
 		}
 	}
 	async addCat(title,color){
 		// adds a category to the database and to the categories list of this object
-		const db = sqlite.openDatabase('main');
-		const [res] = await db.execAsync([
-			{sql:'INSERT INTO category(title,color) VALUES(?,?)',args:[title,color]},
-		],false);
+		const db = sqlite.openDatabaseSync('main');
+		const rank = await getCatRank(db);
+		const res = await db.runAsync(
+			'INSERT INTO category(title,color,rank) VALUES(?,?,?)',
+			[title,color,rank]
+		);
 		db.closeAsync();
-		this.categories[color].push(new Category(res.insertId,title,color));
+		this.categories.push(new Category(res.lastInsertRowId,title,color,rank));
+	}
+	async moveCat(){
+		// write this
 	}
 	async editCat(id,title,color){
 		// edits a category
-		const db = sqlite.openDatabase('main');
-		await db.execAsync([
-			{sql:'UPDATE category SET title=?,color=? WHERE rowid=?',args:[title,color,id]},
-		],false);
+		const db = sqlite.openDatabaseSync('main');
+		await db.runAsync(
+			'UPDATE category SET title=?,color=? WHERE rowid=?',
+			[title,color,id]
+		);
 		await this.getCats();
 		db.closeAsync();
 	}
 	async removeCat(id){
 		// deletes a category from database and the categories list
-		db = sqlite.openDatabase('main');
-		const res = await db.execAsync([
-			{sql:'SELECT rowid FROM task WHERE catid=?',args:[id]},
-			{sql:'DELETE FROM task WHERE catid=?',args:[id]},
-			{sql:'DELETE FROM category WHERE rowid=?',args:[id]},
-		],false);
+		db = sqlite.openDatabaseSync('main');
+		const res = db.getAllSync(
+			'SELECT rowid FROM task WHERE catid=?',
+			[id],
+		);
+		await db.runAsync(
+			'DELETE FROM task WHERE catid=?',
+			id
+		);
+		await db.runAsync(
+			'DELETE FROM category WHERE rowid=?',
+			id
+		);
+		// hi
 		db.closeAsync();
-		Object.keys(this.categories).forEach(key=>{
-			this.categories[key] = this.categories[key].filter(cat=>cat.id!=id);
-		});
-		if(res[0].rows){
-			return res[0].rows.map(row=>row.rowid);
+		this.categories = this.categories.filter(cat=>cat.id!=id);
+		if(res){
+			return res.map(row=>row.rowid);
 		} else {
 			return [];
 		}
 	}
 	async addTask(title,note,catid) {
 		// adds a new task to the database and the respective category
-		db = sqlite.openDatabase('main');
-		let [rank] = await db.execAsync([
-			{sql:'SELECT max(rank) FROM task WHERE catid=?',args:[catid]}
-		],true);
-		if(rank.rows[0]){
-			rank = rank.rows[0]['max(rank)']+1;
-		} else {
-			rank = 1;
-		}
-		const [res] = await db.execAsync([
-			{sql:'INSERT INTO task(title,note,rank,catid) VALUES (?,?,?,?)',args:[title,note,rank,catid]}
-		],false);
+		db = sqlite.openDatabaseSync('main');
+		const rank = await getTaskRank(db,catid);
+		const res = await db.runAsync(
+			'INSERT INTO task(title,note,rank,catid) VALUES (?,?,?,?)',
+			[title,note,rank,catid]
+		);
 		db.closeAsync();
-		Object.values(this.categories).forEach(list=>{
-			list.forEach(cat=>{
-				if(catid==cat.id){
-					cat.tasks.push(res.insertId);
-				}
-			});
-		});
-		return res.insertId;
+		for(cat of this.categories){
+			if(cat.id==catid){
+				await cat.getTasks();
+			}
+		}
+		return res.lastInsertRowId;
 	}
 	async removeTask(tid) {
 		// removes task from database and respective category
-		db = sqlite.openDatabase('main');
-		await db.execAsync([
-			{sql:'DELETE FROM task WHERE rowid=?',args:[tid]},
-		],false);
-		Object.values(this.categories).forEach(list=>{
-			list.forEach(cat=>{
-				cat.tasks = cat.tasks.filter(id=>id!==tid);
-			});
+		db = sqlite.openDatabaseSync('main');
+		await db.runAsync(
+			'DELETE FROM task WHERE rowid=?',
+			[tid]
+		);
+		this.categories.forEach(cat=>{
+			cat.tasks = cat.tasks.filter(id=>id!==tid);
 		});
 		db.closeAsync();
 	}
@@ -128,10 +111,11 @@ export class Categories {
 
 class Category {
 	// the object representing a category
-	constructor(id,title,color){
+	constructor(id,title,color,rank){
 		this.id = id;
 		this.title = title;
 		this.color = color;
+		this.rank = rank;
 		this.tasks = []; // a list of task ids of tasks belonging to this category
 	}
 	addTask(id){
@@ -140,31 +124,20 @@ class Category {
 	async getTasks(){
 		// populates this.tasks
 		this.tasks = [];
-		const db = sqlite.openDatabase('main');
-		const [res] = await db.execAsync([
-			{sql:'SELECT rowid FROM task WHERE catid=? ORDER BY done,rank',args:[this.id]}
-		],true);
-		if(res.rows){
-			res.rows.forEach(row => {
+		const db = sqlite.openDatabaseSync('main');
+		const res = db.getAllSync(
+			'SELECT rowid FROM task WHERE catid=? ORDER BY done,rank',
+			[this.id]
+		);
+		db.closeAsync();
+		if(res){
+			res.forEach(row => {
 				this.tasks.push(row.rowid);
 			});
 		}
 	}
-	async moveUp(catid,id,rank){
-		const db = sqlite.openDatabase('main');
-		await db.execAsync([
-			{sql:'UPDATE task SET rank=? WHERE catid=? AND rank=?',args:[rank,catid,rank-1]},
-			{sql:'UPDATE task SET rank=? WHERE rowid=?',args:[rank-1,id]},
-		],false);
-		db.closeAsync();
-	}
-	async moveDown(catid,id,rank){
-		const db = sqlite.openDatabase('main');
-		await db.execAsync([
-			{sql:'UPDATE task SET rank=? WHERE catid=? AND rank=?',args:[rank,catid,rank+1]},
-			{sql:'UPDATE task SET rank=? WHERE rowid=?',args:[rank+1,id]},
-		],false);
-		db.closeAsync();
+	async moveTask(){
+		// write this
 	}
 }
 
@@ -181,43 +154,27 @@ class Task {
 	async flipDone(){
 		// flips done properties
 		this.done = !this.done;
-		const db = sqlite.openDatabase('main');
-		await db.execAsync([
-			{sql:'UPDATE task SET done=? WHERE rowid=?',args:[Number(this.done),this.id]},
-		],false);
+		const db = sqlite.openDatabaseSync('main');
+		await db.runAsync(
+			'UPDATE task SET done=? WHERE rowid=?',
+			[Number(this.done),this.id]
+		);
 		db.closeAsync();
 	}
 	async updateTask(title,note,catid=0){
 		// updates the task
-		const db = sqlite.openDatabase('main');
+		const db = sqlite.openDatabaseSync('main');
 		if(catid===0){
-			await db.execAsync([
-				{sql: 'UPDATE task SET title=?,note=? WHERE rowid=?',args: [title,note,this.id]},
-			],false);
+			await db.runAsync(
+				'UPDATE task SET title=?,note=? WHERE rowid=?',
+				[title,note,this.id]
+			);
 		} else {
-			let [rank,count] = await db.execAsync([
-				{sql:'SELECT max(rank) FROM task WHERE catid=?',args:[catid]},
-				{sql:'SELECT count(rank) FROM task WHERE catid=?',args:[this.catid]}
-			],true);
-			if(rank.rows[0]){
-				rank = rank.rows[0]['max(rank)']+1;
-			} else {
-				rank = 1;
-			}
-			if(count.rows[0]){
-				count = count.rows[0]['count(rank)']-this.rank;
-			} else {
-				count = 0;
-			}
-			await db.execAsync([
-				{sql: 'UPDATE task SET title=?,note=?,catid=?,rank=? WHERE rowid=?',args: [title,note,catid,rank,this.id]},
-				...[...Array(count).keys()].map(i=>{
-					return {
-						sql: 'UPDATE task SET rank=? WHERE catid=? and rank=?',
-						args: [i+this.rank,this.catid,i+this.rank+1],
-					};
-				})
-			],false);
+			const rank = await getTaskRank(db,catid);
+			await db.runAsync(
+				'UPDATE task SET title=?,note=?,catid=?,rank=? WHERE rowid=?',
+				[title,note,catid,rank,this.id]
+			);
 			this.catid = catid;
 			this.rank = rank;
 		}
@@ -287,34 +244,30 @@ export class  Current {
 	}
 	async archive(){
 		let tasks = [];
-		const db = sqlite.openDatabase('main');
-		const ts = await db.execAsync(this.tasks.map(tid=>{
-			return {sql: 'SELECT title,done FROM task WHERE rowid=?',args: [tid]};
-		}),true);
+		const db = sqlite.openDatabaseSync('main');
+		const ts = this.tasks.map(tid=>
+			db.getFirstSync('SELECT title,done FROM task WHERE rowid=?',tid)
+		);
 		ts.forEach(t=>{
-			if(t.rows){
+			if(t){
 				tasks.push({
-					title: t.rows[0].title,
-					done: Boolean(t.rows[0].done),
+					title: t.title,
+					done: Boolean(t.done),
 				});
 			}
 		});
-		const [res] = await db.execAsync([
-			{
-				sql:'INSERT INTO archived(date,gratitude,tasks) VALUES(?,?,?)',
-				args:[
-					this.date.stringify(),
-					JSON.stringify(this.gratitude),
-					JSON.stringify(tasks),
-				]
-			},
-		],false);
+		const res = await db.runAsync(
+			'INSERT INTO archived(date,gratitude,tasks) VALUES(?,?,?)',
+			this.date.stringify(),
+			JSON.stringify(this.gratitude),
+			JSON.stringify(tasks),
+		);
 		db.closeAsync();
 		this.date = new Date();
 		this.gratitude = ['','',''];
 		this.tasks = [];
 		SecureStore.setItem('current',this.stringify());
-		return res.insertId;
+		return res.lastInsertRowId;
 	}
 }
 
@@ -329,24 +282,50 @@ class Archived {
 
 export async function initDB(){
 	// initializes database tables
-	const db = sqlite.openDatabase('main');
-	await db.execAsync([
-		{sql:'CREATE TABLE IF NOT EXISTS category(title TEXT NOT NULL, color TEXT NOT NULL)',args:[]},
-		{sql:'CREATE TABLE IF NOT EXISTS task(title TEXT NOT NULL, note TEXT, done INTEGER DEFAULT 0, rank INTEGER NOT NULL, catid INTEGER NOT NULL, FOREIGN KEY(catid) REFERENCES category(rowid))',args:[]},
-		{sql:'CREATE TABLE IF NOT EXISTS archived(date TEXT, gratitude TEXT, tasks TEXT)',args:[]},
-	],false);
+	const db = sqlite.openDatabaseSync('main');
+	await db.execAsync(
+		`
+			CREATE TABLE IF NOT EXISTS category(title TEXT NOT NULL, color TEXT NOT NULL, rank REAL NOT NULL);
+			CREATE TABLE IF NOT EXISTS task(title TEXT NOT NULL, note TEXT, done INTEGER DEFAULT 0, rank REAL NOT NULL, catid INTEGER NOT NULL, FOREIGN KEY(catid) REFERENCES category(rowid));
+			CREATE TABLE IF NOT EXISTS archived(date TEXT, gratitude TEXT, tasks TEXT);
+		`
+	);
 	db.closeAsync();
+}
+
+async function getTaskRank(db,catid){
+	let rank = db.getFirstSync(
+		'SELECT max(rank) FROM task WHERE catid=?',
+		[catid]
+	);
+	if(rank){
+		rank = rank['max(rank)']+4;
+	} else {
+		rank = 1;
+	}
+	return rank;
+}
+async function getCatRank(db){
+	const rank = db.getFirstSync(
+		'SELECT max(rank) FROM category',
+	);
+	if(rank){
+		return rank['max(rank)']+4;
+	} else {
+		return 1;
+	}
 }
 
 export async function getTask(id){
 	// get the task object with the given id from database
-	const db = sqlite.openDatabase('main');
-	const [res] = await db.execAsync([
-		{sql:'SELECT * FROM task WHERE rowid=?',args:[id]},
-	],true);
+	const db = sqlite.openDatabaseSync('main');
+	const res = db.getFirstSync(
+		'SELECT * FROM task WHERE rowid=?',
+		id
+	);
 	db.closeAsync();
-	if(res.rows){
-		return new Task(id,...Object.values(res.rows[0]));
+	if(res){
+		return new Task(id,...Object.values(res));
 	} else {
 		return null;
 	}
@@ -354,30 +333,39 @@ export async function getTask(id){
 
 export async function getCat(id){
 	// get the category object with the given id from database
-	const db = sqlite.openDatabase('main');
-	const [res] = await db.execAsync([
-		{sql:'SELECT * FROM category WHERE rowid=?',args:[id]}
-	],true);
+	const db = sqlite.openDatabaseSync('main');
+	const res = db.getFirstSync(
+		'SELECT * FROM category WHERE rowid=?',
+		id
+	);
 	db.closeAsync();
-	if(res.rows){
-		return new Category(id,res.rows[0].title,res.rows[0].color);
+	if(res){
+		return new Category(id,res.title,res.color);
 	} else {
 		return null;
 	}
 }
 
 export async function getArchived(){
-	const db = sqlite.openDatabase('main');
-	const [res] = await db.execAsync([
-		{sql:'SELECT rowid,date,gratitude,tasks FROM archived ORDER BY rowid DESC',args:[]},
-	],true);
+	const db = sqlite.openDatabaseSync('main');
+	const res = db.getAllSync(
+		'SELECT rowid,date,gratitude,tasks FROM archived ORDER BY rowid DESC',
+		[]
+	);
 	db.closeAsync();
-	return res.rows.map(row=>new Archived(...Object.values(row)));
+	return res.map(row=>new Archived(...Object.values(row)));
 }
 export async function deleteArchived(id){
-	const db = sqlite.openDatabase('main');
-	await db.execAsync([
-		{sql:'DELETE FROM archived WHERE rowid=?',args:[id]}
-	],false);
+	const db = sqlite.openDatabaseSync('main');
+	await db.runAsync(
+		'DELETE FROM archived WHERE rowid=?',
+		id
+	);
+	db.closeAsync();
+}
+
+export async function checkNormalize(){
+	const db = sqlite.openDatabaseSync('main');
+	// check and normalize ranks if needed
 	db.closeAsync();
 }
