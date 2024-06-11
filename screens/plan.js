@@ -126,7 +126,7 @@ export default function Plan({tDel,tEdit,setCur,setNTask,setCurT,data}){
 						:<PlanlyTextInput placeholder={dateView.month[lang]} autoCapitalize='none' value={month} onChangeText={setMonth} onEndEditing={saveMonth} style={styles.dateInput} />
 					}
 					<PlanlyTextInput placeholder={dateView.year[lang]} autoCapitalize='none' value={year} onChangeText={setYear} onEndEditing={saveYear} style={styles.dateInput} />
-					<DropDown items={getWeekDays(ws,lang)} action={saveWeekDay} width={125} initial={current.date.weekday===-1?'':current.date.weekday} label={dateView.weekDay[lang]} refresh={refresh} />
+					<DropDown items={getWeekDays(ws,lang)} action={saveWeekDay} width={125} initial={current.date.weekday===-1?'':((7+current.date.weekday-ws)%7)} label={dateView.weekDay[lang]} refresh={refresh} />
 				</PlanlyView>
 
 				<PlanlyView style={styles.itemBlock}>
