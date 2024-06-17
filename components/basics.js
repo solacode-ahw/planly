@@ -37,7 +37,7 @@ export function PlanlyModal({show,setShow,children,height='auto'}){
 
 	return (
 		<Modal animationType="slide" transparent={true} visible={show} onRequestClose={()=>setShow(false)}>
-			<PlanlyView style={styles.modalOut}>
+			<PlanlyView style={{...styles.modalOut,backgroundColor:`${themeColors[theme]}DF`}}>
 				<Pressable onPress={()=>setShow(false)} style={styles.modalBack} />
 				<PlanlyView transparent={false} style={{...styles.modalIn,shadowColor:themeColors[color],height:height}}>
 					{children}
