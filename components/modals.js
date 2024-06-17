@@ -1,4 +1,4 @@
-import { StyleSheet, Pressable, Image } from "react-native";
+import { StyleSheet, Pressable, Image, ScrollView, View } from "react-native";
 import { useContext, useEffect, useRef, useState } from "react";
 
 import { SettingsContext } from "../utils/hooks";
@@ -111,7 +111,7 @@ export function NewTask({action,catid,items}){
 		<PlanlyView style={styles.modal}>
 			<TitleText>{newTaskModal.title[lang]}</TitleText>
 			<PlanlyTextInput placeholder={newTaskModal.task[lang]} value={title} onChangeText={setTitle} autoFocus={true} autoCapitalize='words' />
-			<PlanlyTextInput placeholder={newTaskModal.note[lang]} value={note} onChangeText={setNote} multiline={true} />
+			<PlanlyTextInput placeholder={newTaskModal.note[lang]} value={note} onChangeText={setNote} multiline={true} style={styles.multiline} />
 			<PlanlyView>
 				<LabelText style={{paddingBottom:8}}>{newTaskModal.category[lang]}</LabelText>
 				<DropDown items={items} action={setCat} initial={cat} width={252} direction="up" />
@@ -142,7 +142,7 @@ export function EditTask({task,action,items}){
 		<PlanlyView style={styles.modal}>
 			<TitleText>{editTaskModal.title[lang]}</TitleText>
 			<PlanlyTextInput placeholder={editTaskModal.task[lang]} value={title} onChangeText={setTitle} autoCapitalize='words' />
-			<PlanlyTextInput placeholder={editTaskModal.note[lang]} value={note} onChangeText={setNote} multiline={true} />
+			<PlanlyTextInput placeholder={editTaskModal.note[lang]} value={note} onChangeText={setNote} multiline={true} style={styles.multiline} />
 			<PlanlyView>
 				<LabelText style={{paddingBottom:8}}>{editTaskModal.category[lang]}</LabelText>
 				<DropDown items={items} action={setCat} initial={cat} width={252} direction="up" />
@@ -184,7 +184,9 @@ export function ViewTask({task,back,onEdit}){
 					<TapButton icon='edit' action={onEdit} />
 				</PlanlyView>
 				{task.note?
-					<BodyText>{task.note}</BodyText>
+					<ScrollView style={styles.scroll}>
+						<BodyText>{task.note}</BodyText>
+					</ScrollView>
 					:null
 				}
 				<PlanlyView style={styles.row}>
@@ -211,9 +213,11 @@ export function ViewArchive({date,grats,tasks,back}){
 			</PlanlyView>
 			<PlanlyView style={styles.block}>
 				<LabelText>{archiveViewLabels.tasks[lang]}</LabelText>
-				{tasks.map(task=>
-					<BodyText style={task.done?styles.stroked:styles.normal} key={tasks.indexOf(task)}>{task.title}</BodyText>
-				)}
+				<ScrollView style={styles.scroll}>
+					{tasks.map(task=>
+						<BodyText style={task.done?styles.stroked:styles.normal} key={tasks.indexOf(task)}>{task.title}</BodyText>
+					)}
+				</ScrollView>
 			</PlanlyView>
 			<TapButton icon='down' action={back} style={styles.center} />
 		</PlanlyView>
@@ -312,5 +316,11 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		flexDirection: 'column',
 		gap: 16,
+	},
+	scroll: {
+		maxHeight: 150,
+	},
+	multiline: {
+		maxHeight: 125,
 	}
 });
