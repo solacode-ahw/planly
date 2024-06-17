@@ -57,7 +57,11 @@ export function TaskItem ({task,picker,last=false,plan=false,pick=()=>{},items={
 		}
 	};
 	const editFromPlan = (title,note,catid) => {
-		task.updateTask(title,note,catid);
+		if(catid===task.catid){
+			task.updateTask(title,note);
+		} else {
+			task.updateTask(title,note,catid);
+		}
 		setTitle(title);
 		setNote(note);
 		setEdit(false);
