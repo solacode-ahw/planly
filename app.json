@@ -2,10 +2,9 @@
   "expo": {
     "name": "PLANLY",
     "slug": "planly",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/graphics/icon.png",
-    "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/graphics/splash.png",
       "resizeMode": "contain",
