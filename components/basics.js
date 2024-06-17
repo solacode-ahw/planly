@@ -37,9 +37,12 @@ export function PlanlyModal({show,setShow,children,height='auto'}){
 
 	return (
 		<Modal animationType="slide" transparent={true} visible={show} onRequestClose={()=>setShow(false)}>
-			<PlanlyView style={styles.modalOut}><PlanlyView transparent={false} style={{...styles.modalIn,shadowColor:themeColors[color],height:height}}>
-				{children}
-			</PlanlyView></PlanlyView>
+			<PlanlyView style={styles.modalOut}>
+				<Pressable onPress={()=>setShow(false)} style={styles.modalBack} />
+				<PlanlyView transparent={false} style={{...styles.modalIn,shadowColor:themeColors[color],height:height}}>
+					{children}
+				</PlanlyView>
+			</PlanlyView>
 		</Modal>
 	);
 }
@@ -129,26 +132,28 @@ export function DropDown({items,action,width,initial='',label='',direction='down
 				<Image source={require('../assets/icons/drop-fill.png')} tintColor={themeColors[color]} style={{width:12,height:12}} />
 			</Pressable>
 			<Modal transparent={true} visible={open} animationType="fade" onRequestClose={()=>setOpen(false)}>
-				<View><PlanlyView transparent={false} style={{...pose,shadowColor:themeColors[color],...styles.dropOpen,width:width}}>
-					{direction!=='down'?null:
-						<Pressable onPress={()=>setOpen(false)} style={styles.dropTop}>
-							<BodyText style={value?{}:{color:themeColors.gray}}>{value?items[value]:label}</BodyText>
-							<Image source={require('../assets/icons/dropup-fill.png')} tintColor={themeColors[color]} style={{width:12,height:12}} />
-						</Pressable>
-					}
-					{Object.keys(items).map(key=>
-						key==value?null:
-							<Pressable onPress={()=>pick(key)} style={styles.dropItem} key={key}>
-								<BodyText>{items[key]}</BodyText>
+				<View>
+					<PlanlyView transparent={false} style={{...pose,shadowColor:themeColors[color],...styles.dropOpen,width:width}}>
+						{direction!=='down'?null:
+							<Pressable onPress={()=>setOpen(false)} style={styles.dropTop}>
+								<BodyText style={value?{}:{color:themeColors.gray}}>{value?items[value]:label}</BodyText>
+								<Image source={require('../assets/icons/dropup-fill.png')} tintColor={themeColors[color]} style={{width:12,height:12}} />
 							</Pressable>
-					)}
-					{direction==='down'?null:
-						<Pressable onPress={()=>setOpen(false)} style={styles.dropTop}>
-							<BodyText style={value?{}:{color:themeColors.gray}}>{value?items[value]:label}</BodyText>
-							<Image source={require('../assets/icons/drop-fill.png')} tintColor={themeColors[color]} style={{width:12,height:12}} />
-						</Pressable>
-					}
-				</PlanlyView></View>
+						}
+						{Object.keys(items).map(key=>
+							key==value?null:
+								<Pressable onPress={()=>pick(key)} style={styles.dropItem} key={key}>
+									<BodyText>{items[key]}</BodyText>
+								</Pressable>
+						)}
+						{direction==='down'?null:
+							<Pressable onPress={()=>setOpen(false)} style={styles.dropTop}>
+								<BodyText style={value?{}:{color:themeColors.gray}}>{value?items[value]:label}</BodyText>
+								<Image source={require('../assets/icons/drop-fill.png')} tintColor={themeColors[color]} style={{width:12,height:12}} />
+							</Pressable>
+						}
+					</PlanlyView>
+				</View>
 			</Modal>
 		</View>
 	);
@@ -171,6 +176,13 @@ const styles = StyleSheet.create({
 		flexDirection: 'column',
 		justifyContent: 'flex-end',
 		alignItems: 'center',
+	},
+	modalBack: {
+		position: 'relative',
+		top: 0,
+		start: 0,
+		width: '100%',
+		height: '100%',
 	},
 	modalIn: {
 		paddingVertical: 32,
