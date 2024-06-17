@@ -303,4 +303,16 @@ export const about = {
 		en: 'To report any issues, contact me via email:',
 		fa: 'برای گزارش مشکلات اپلیکیشن، به ایمیل زیر پیام بفرستید:',
 	},
+	resources: {
+		en: 'Resources',
+		fa: 'منابع'
+	},
+	icons: {
+		en: ['Icons','Phosphore Icons','https://phosphoricons.com'],
+		fa: ['آیکون‌ها','Phosphore Icons','https://phosphoricons.com'],
+	},
+	font: {
+		en: ['Font','Borna','https://fontiran.com/fonts/borna'],
+		fa: ['فونت','برنا','https://fontiran.com/fonts/borna'],
+	},
 };
