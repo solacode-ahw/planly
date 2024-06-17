@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
 		alignContent: 'stretch',
 	},
 	tasksBlock: {
-		paddingVertical: 16,
+		paddingBottom: 6,
 	},
 	addTaskButton: {
 		alignSelf: 'flex-start',

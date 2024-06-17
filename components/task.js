@@ -76,16 +76,14 @@ export function TaskItem ({task,picker,last=false,plan=false,pick=()=>{},items={
 
 	if(plan) {
 		return (
-			<PlanlyView>
+			<PlanlyView style={styles.planned}>
 				<PlanlyView style={styles.plannedRow}>
 					<TapButton icon={done?'checkbox':'box'} action={flipDone} />
-					<PlanlyView style={styles.plannedDetails}>
-						<BodyText style={styles.plannedLabel}>{title}</BodyText>
-						<BodyText style={styles.plannedNote}>{note}</BodyText>
-					</PlanlyView>
+					<BodyText style={styles.plannedLabel}>{title}</BodyText>
 					<TapButton icon='edit' action={()=>setEdit(true)} />
 					<TapButton icon='remove' action={()=>onDel(task.id)} />
 				</PlanlyView>
+				<BodyText style={styles.plannedNote}>{note}</BodyText>
 				<PlanlyModal show={edit} setShow={setEdit}>
 					<EditTask task={task} action={editFromPlan} items={items} />
 				</PlanlyModal>
@@ -153,25 +151,23 @@ const styles = StyleSheet.create({
 		width: 20,
 		height: 20,
 	},
+	planned: {
+		paddingVertical: 6,
+	},
 	plannedRow: {
 		display: 'flex',
 		flexDirection: 'row',
 		gap: 20,
 		alignItems: 'flex-start',
-	},
-	plannedDetails: {
-		display: 'flex',
-		flexGrow: 1,
-		flexShrink: 1,
-		alignContent: 'stretch',
-		flexDirection: 'column',
-		alignItems: 'stretch',
-		justifyContent: 'flex-start',
+		justifyContent: 'center',
 	},
 	plannedLabel: {
-		height: 20,
+		alignContent: 'stretch',
+		flexGrow: 1,
+		flexShrink: 1,
 	},
 	plannedNote: {
 		color: themeColors.gray,
+		paddingHorizontal: 40,
 	},
 });
