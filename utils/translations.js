@@ -231,6 +231,10 @@ export const archiveViewLabels = {
 		en: 'I wanted to do:',
 		fa: 'می‌خواستم انجام دهم',
 	},
+	delButton: {
+		en: 'Remove',
+		fa: 'حذف',
+	},
 };
 
 export const settingsLabels = {

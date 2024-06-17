@@ -19,6 +19,7 @@ function ArchivedItem({archived,onDel}){
 
     const del = ()=>{
         setWarn(false);
+        setView(false);
         onDel(archived.id);
     };
 
@@ -30,7 +31,7 @@ function ArchivedItem({archived,onDel}){
                 <TapButton icon='bin' action={()=>setWarn(true)} />
             </PlanlyView>
             <PlanlyModal show={view} setShow={setView}>
-                <ViewArchive date={archived.date.display(dateStyle,weekDays[lang],archiveDate[lang])} grats={archived.gratitude} tasks={archived.tasks} back={()=>setView(false)} />
+                <ViewArchive date={archived.date.display(dateStyle,weekDays[lang],archiveDate[lang])} grats={archived.gratitude} tasks={archived.tasks} back={()=>setView(false)} onDel={()=>setWarn(true)} />
             </PlanlyModal>
             <PlanlyModal show={warn} setShow={setWarn}>
                 <Warning message={archiveRemoveWarning.message[lang]} labels={archiveRemoveWarning.labels[lang]} actions={[()=>setWarn(false),del]} />

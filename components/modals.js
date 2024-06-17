@@ -199,7 +199,7 @@ export function ViewTask({task,back,onEdit}){
 	}
 }
 
-export function ViewArchive({date,grats,tasks,back}){
+export function ViewArchive({date,grats,tasks,back,onDel}){
 	const lang = useContext(SettingsContext).lang;
 
 	return (
@@ -219,6 +219,7 @@ export function ViewArchive({date,grats,tasks,back}){
 					)}
 				</ScrollView>
 			</PlanlyView>
+			<TextButton label={archiveViewLabels.delButton[lang]} action={onDel} style={{alignSelf: 'flex-start'}} />
 			<TapButton icon='down' action={back} style={styles.center} />
 		</PlanlyView>
 	);
