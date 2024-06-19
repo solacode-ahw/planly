@@ -1,4 +1,4 @@
-import { Pressable, Image, StyleSheet } from "react-native";
+import { Pressable, Image, StyleSheet, Dimensions } from "react-native";
 import { useContext, useState, useMemo, useEffect } from "react";
 
 import { themeColors } from "../utils/colors";
@@ -10,7 +10,7 @@ import { BodyText, PlanlyView, PlanlyModal } from "./basics";
 import { TapButton } from "./buttons";
 import { ViewTask, EditTask, Warning } from "./modals";
 
-export function TaskItem ({task,picker,last=false,plan=false,pick=()=>{},items={},onEdit=()=>{},onDel=()=>{},onFlip=()=>{},onDown=()=>{}}){
+export function TaskItem ({task,picker,plan=false,pick=()=>{},items={},onEdit=()=>{},onDel=()=>{},onFlip=()=>{}}){
 	/*
 		displays a task
 
@@ -97,9 +97,9 @@ export function TaskItem ({task,picker,last=false,plan=false,pick=()=>{},items={
 		return (
 			<PlanlyView style={{width: '100%'}}>
 				<PlanlyView style={styles.row}>
-					{picker || done ||last ?
+					{picker?
 						<PlanlyView style={styles.img} />:
-						<TapButton icon='down' action={()=>onDown(task.id,task.rank)} />
+						null
 					}
 					<Pressable style={styles.label} onPress={picker?()=>pick(task.id):flipDone}>
 						<BodyText 
@@ -130,12 +130,12 @@ export function TaskItem ({task,picker,last=false,plan=false,pick=()=>{},items={
 
 const styles = StyleSheet.create({
 	row: {
-		width: '100%',
 		display: 'flex',
 		flexDirection: 'row',
 		alignItems: 'center',
 		gap: 20,
 		paddingVertical: 10,
+		width: Dimensions.get('window').width-112,
 	},
 	label: {
 		alignContent: 'stretch',

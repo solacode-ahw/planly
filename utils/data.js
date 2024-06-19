@@ -23,7 +23,7 @@ export class Categories {
 		const res = db.getAllSync(
 			'SELECT rowid,title,color,rank FROM category ORDER BY rank'
 		);
-		db.closeAsync();
+		db.closeSync();
 		if(res) {
 			for(row of res){
 				this.categories.push(new Category(row.rowid,row.title,row.color,row.rank));
@@ -39,11 +39,31 @@ export class Categories {
 			'INSERT INTO category(title,color,rank) VALUES(?,?,?)',
 			[title,color,rank]
 		);
-		db.closeAsync();
+		db.closeSync();
 		this.categories.push(new Category(res.lastInsertRowId,title,color,rank));
 	}
-	async moveCat(){
-		// write this
+	async moveCat(to){
+		const db = sqlite.openDatabaseSync('main');
+		let rank;
+		if(to===0){
+			// if cat is moved to begining of list
+			rank = this.categories[1].rank/2;
+		} else if(to===this.categories.length-1){
+			// if cat is moved to end of list
+			rank = this.categories[to-1].rank+4;
+		} else {
+			// if cat is moved somewhere in between
+			rank = (this.categories[to-1].rank + this.categories[to+1].rank)/2;
+		}
+		this.categories[to].rank = rank;
+		db.runSync(
+			'UPDATE category SET rank=? WHERE rowid=?',
+			[
+				rank,
+				this.categories[to].id
+			]
+		);
+		db.closeSync();
 	}
 	async editCat(id,title,color){
 		// edits a category
@@ -53,7 +73,7 @@ export class Categories {
 			[title,color,id]
 		);
 		await this.getCats();
-		db.closeAsync();
+		db.closeSync();
 	}
 	async removeCat(id){
 		// deletes a category from database and the categories list
@@ -71,7 +91,7 @@ export class Categories {
 			id
 		);
 		// hi
-		db.closeAsync();
+		db.closeSync();
 		this.categories = this.categories.filter(cat=>cat.id!=id);
 		if(res){
 			return res.map(row=>row.rowid);
@@ -87,7 +107,7 @@ export class Categories {
 			'INSERT INTO task(title,note,rank,catid) VALUES (?,?,?,?)',
 			[title,note,rank,catid]
 		);
-		db.closeAsync();
+		db.closeSync();
 		for(cat of this.categories){
 			if(cat.id==catid){
 				await cat.getTasks();
@@ -105,7 +125,7 @@ export class Categories {
 		this.categories.forEach(cat=>{
 			cat.tasks = cat.tasks.filter(id=>id!==tid);
 		});
-		db.closeAsync();
+		db.closeSync();
 	}
 }
 
@@ -129,15 +149,35 @@ class Category {
 			'SELECT rowid FROM task WHERE catid=? ORDER BY done,rank',
 			[this.id]
 		);
-		db.closeAsync();
+		db.closeSync();
 		if(res){
 			res.forEach(row => {
 				this.tasks.push(row.rowid);
 			});
 		}
 	}
-	async moveTask(){
+	async moveTask(to){
 		// write this
+		const db = sqlite.openDatabaseSync('main');
+		let rank;
+		if(to===0){
+			// if cat is moved to begining of list
+			rank = db.getFirstSync('SELECT rank FROM task WHERE rowid=?',this.tasks[1]).rank/2;
+		} else if(to===this.tasks.length-1){
+			// if cat is moved to end of list
+			rank = db.getFirstSync('SELECT rank FROM task WHERE rowid=?',this.tasks[to-1]).rank+4;
+		} else {
+			// if cat is moved somewhere in between
+			rank = ( db.getFirstSync('SELECT rank FROM task WHERE rowid=?',this.tasks[to-1]).rank + db.getFirstSync('SELECT rank FROM task WHERE rowid=?',this.tasks[to+1]).rank ) / 2;
+		}
+		db.runSync(
+			'UPDATE task SET rank=? WHERE rowid=?',
+			[
+				rank,
+				this.tasks[to]
+			]
+		);
+		db.closeSync();
 	}
 }
 
@@ -159,7 +199,7 @@ class Task {
 			'UPDATE task SET done=? WHERE rowid=?',
 			[Number(this.done),this.id]
 		);
-		db.closeAsync();
+		db.closeSync();
 	}
 	async updateTask(title,note,catid=0){
 		// updates the task
@@ -178,7 +218,7 @@ class Task {
 			this.catid = catid;
 			this.rank = rank;
 		}
-		db.closeAsync();
+		db.closeSync();
 		this.title=title;
 		this.note=note;
 	}
@@ -262,7 +302,7 @@ export class  Current {
 			JSON.stringify(this.gratitude),
 			JSON.stringify(tasks),
 		);
-		db.closeAsync();
+		db.closeSync();
 		this.date = new Date();
 		this.gratitude = ['','',''];
 		this.tasks = [];
@@ -290,7 +330,8 @@ export async function initDB(){
 			CREATE TABLE IF NOT EXISTS archived(date TEXT, gratitude TEXT, tasks TEXT);
 		`
 	);
-	db.closeAsync();
+	await checkNormalize(db);
+	db.closeSync();
 }
 
 async function getTaskRank(db,catid){
@@ -323,7 +364,7 @@ export async function getTask(id){
 		'SELECT * FROM task WHERE rowid=?',
 		id
 	);
-	db.closeAsync();
+	db.closeSync();
 	if(res){
 		return new Task(id,...Object.values(res));
 	} else {
@@ -338,9 +379,9 @@ export async function getCat(id){
 		'SELECT * FROM category WHERE rowid=?',
 		id
 	);
-	db.closeAsync();
+	db.closeSync();
 	if(res){
-		return new Category(id,res.title,res.color);
+		return new Category(id,res.title,res.color,res.rank);
 	} else {
 		return null;
 	}
@@ -352,7 +393,7 @@ export async function getArchived(){
 		'SELECT rowid,date,gratitude,tasks FROM archived ORDER BY rowid DESC',
 		[]
 	);
-	db.closeAsync();
+	db.closeSync();
 	return res.map(row=>new Archived(...Object.values(row)));
 }
 export async function deleteArchived(id){
@@ -361,11 +402,9 @@ export async function deleteArchived(id){
 		'DELETE FROM archived WHERE rowid=?',
 		id
 	);
-	db.closeAsync();
+	db.closeSync();
 }
 
-export async function checkNormalize(){
-	const db = sqlite.openDatabaseSync('main');
+async function checkNormalize(db){
 	// check and normalize ranks if needed
-	db.closeAsync();
 }

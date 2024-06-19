@@ -1,4 +1,5 @@
-import { Image, StyleSheet } from "react-native";
+import { Image, StyleSheet, Pressable } from "react-native";
+import DraggableFlatList from "react-native-draggable-flatlist";
 import { useState, useContext, useEffect, useRef } from "react";
 
 import { categoryColors, themeColors } from "../utils/colors";
@@ -31,7 +32,6 @@ export function CategoryItem({cat,refresh,picker,onDel,onEdit,onAddTask,onEditTa
 	const lang = useContext(SettingsContext).lang;
 
 	const tasks = useRef([]);
-	const last = useRef(0);
 	const [load,setLoad] = useState(0);
 	const [loaded,setLoaded] = useState(0);
 
@@ -46,22 +46,15 @@ export function CategoryItem({cat,refresh,picker,onDel,onEdit,onAddTask,onEditTa
 		const get = async(id)=>{
 			if(!picks.includes(id)){
 				tasks.current.push(await getTask(id));
-				if(tasks.current.at(-1).done && !tasks.current.at(-2).done){
-					last.current = tasks.current.at(-2).id;
-				}
 			}
 			if(id===cat.tasks.at(-1)){
-				if(last.current===0){
-					last.current=id;
-				}
 				setLoaded(loaded+1);
 			}
 		};
 		tasks.current=[];
 		if(cat.tasks.length===0){
-			setLoaded(true);
+			setLoaded(loaded+1);
 		} else {
-			last.current = 0;
 			cat.tasks.forEach(tid=>{
 				get(tid);
 			});
@@ -89,11 +82,24 @@ export function CategoryItem({cat,refresh,picker,onDel,onEdit,onAddTask,onEditTa
 		await cat.getTasks();
 		setLoad(load+1);
 	};
-	const downTask = async(id,rank) => {
-		// moves given task one down
-		await cat.moveDown(cat.id,id,rank);
-		await cat.getTasks();
-		setLoad(load+1);
+	const moveTask = ({data,from,to}) => {
+		if(from!==to && data[to].done===false){
+			tasks.current = data;
+			cat.tasks = data.map(t=>t.id);
+			setLoaded(loaded+1);
+			cat.moveTask(to);
+		}
+	};
+
+	const renderTask = ({item,drag,isActive}) => {
+		return (
+			<PlanlyView style={styles.taskItem}>
+				<Pressable disabled={isActive} style={styles.mark} onLongPress={drag}>
+					<Image source={require('../assets/icons/move-light.png')} style={styles.mark} />
+				</Pressable>
+				<TaskItem task={item} picker={false} items={items} onEdit={onEditTask} onDel={onDelTask} onFlip={onTaskFlip} />
+			</PlanlyView>
+		);
 	};
 
 	if(!loaded){
@@ -110,7 +116,15 @@ export function CategoryItem({cat,refresh,picker,onDel,onEdit,onAddTask,onEditTa
 				</PlanlyView>
 				{open?
 					<PlanlyView style={styles.taskContainer}>
-						{tasks.current.map(task=><TaskItem task={task} picker={picker} pick={onPick} items={picker?null:items} onEdit={picker?null:onEditTask} onDel={picker?null:onDelTask} onFlip={onTaskFlip} onDown={downTask} last={last.current===task.id} key={task.id} />)}
+						{picker?
+							tasks.current.map(task=><TaskItem task={task} picker={picker} pick={onPick} items={picker?null:items} onEdit={picker?null:onEditTask} onDel={picker?null:onDelTask} onFlip={onTaskFlip} key={task.id} />):
+							<DraggableFlatList
+								data={tasks.current}
+								onDragEnd={moveTask}
+								keyExtractor={(item)=>item.id}
+								renderItem={renderTask}
+							/>
+						}
 					</PlanlyView>
 				:null}
 				{open?<TapButton icon='up' action={()=>setOpen(false)} />:<TapButton icon='down' action={()=>setOpen(true)} />}
@@ -156,5 +170,12 @@ const styles = StyleSheet.create({
 	mark: {
 		width: 20,
 		height: 20,
-	}
+	},
+	taskItem: {
+		width: '100%',
+		display: 'flex',
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: 20,
+	},
 });

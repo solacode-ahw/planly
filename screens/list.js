@@ -1,7 +1,10 @@
+import { Pressable, StyleSheet } from "react-native";
+import DraggableFlatList from "react-native-draggable-flatlist";
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { useEffect, useState } from "react";
 
 import { HoverButton } from "../components/buttons";
-import { PlanlyModal, PlanlyScreen, PlanlyScroll } from "../components/basics";
+import { PlanlyModal, PlanlyScreen, PlanlyScroll, PlanlyView } from "../components/basics";
 import { NewCategory } from "../components/modals";
 import { CategoryItem } from "../components/category";
 
@@ -70,16 +73,41 @@ export default function List({setTDel,setTEdit,nTask,curT,data}){
 		await cats.removeTask(tid);
 		setCat(cat+1);
 	};
+	const moveCat = ({data,from,to}) => {
+		if(from!==to){
+			cats.categories = data;
+			setCat(cat+1);
+			cats.moveCat(to);
+		}
+	};
+
+	const renderCat = ({item,getIndex,drag,isActive}) => {
+		return (
+			<Pressable disabled={isActive} style={getIndex()===cats.categories.length-1?{...styles.catItem,paddingBottom:48}:styles.catItem} onLongPress={drag}>
+				<CategoryItem cat={item} refresh={cat} picker={false} onDel={delCat} onEdit={editCat} items={cats.items()} onAddTask={addTask} onEditTask={editTask} onDelTask={delTask} />
+			</Pressable>
+		);
+	};
 
 	return (
-		<PlanlyScreen>
-			<PlanlyScroll padded={true}>
-				{Object.values(cats.categories).flat().map(category=><CategoryItem cat={category} refresh={cat} picker={false} onDel={delCat} onEdit={editCat} items={cats.items()} onAddTask={addTask} onEditTask={editTask} onDelTask={delTask} key={category.id} />)}
-			</PlanlyScroll>
+		<GestureHandlerRootView><PlanlyScreen>
+			<DraggableFlatList
+				data={cats.categories}
+				onDragEnd={moveCat}
+				keyExtractor={(item)=>item.id}
+				renderItem={renderCat}
+			/>
 			<HoverButton icon='plus' action={()=>setCatModal(true)} />
 			<PlanlyModal show={catModal} setShow={setCatModal}>
 				<NewCategory action={addCat} />
 			</PlanlyModal>
-		</PlanlyScreen>
+		</PlanlyScreen></GestureHandlerRootView>
 	);
 }
+
+const styles = StyleSheet.create({
+	catItem: {
+		width: '100%',
+		padding: 16,
+	},
+});
