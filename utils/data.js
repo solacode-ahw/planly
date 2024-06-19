@@ -330,7 +330,7 @@ export async function initDB(){
 			CREATE TABLE IF NOT EXISTS archived(date TEXT, gratitude TEXT, tasks TEXT);
 		`
 	);
-	await checkNormalize(db);
+	checkNormalize(db);
 	db.closeSync();
 }
 
@@ -405,6 +405,30 @@ export async function deleteArchived(id){
 	db.closeSync();
 }
 
-async function checkNormalize(db){
+function checkNormalize(db){
 	// check and normalize ranks if needed
+
+	const catIds = db.getAllSync('SELECT rowid FROM category ORDER BY rank').map(item=>item.rowid);
+
+	// category table
+	const catLowest = db.getFirstSync('SELECT min(rank) FROM category')['min(rank)'];
+	const catDiffs = db.getFirstSync('SELECT min(diff) AS min,max(diff) AS max FROM (SELECT rank - LAG(rank) OVER (ORDER BY rank) AS diff FROM category)');
+	if(catLowest>100 || catDiffs['min']<0.1 || catDiffs['max']>100){
+		[...Array(catIds.length).keys()].forEach(i=>{
+			db.runSync('UPDATE category SET rank=? WHERE rowid=?',(4*i)+1,catIds[i]);
+		});
+	}
+
+	// task table
+	let taskLowest,taskDiffs,taskIds;
+	catIds.forEach(id=>{
+		taskLowest = db.getFirstSync('SELECT min(rank) FROM task WHERE catid=?',id)['min(rank)'];
+		taskDiffs = db.getFirstSync('SELECT min(diff) AS min,max(diff) AS max FROM (SELECT rank - LAG(rank) OVER (ORDER BY rank) AS diff FROM task WHERE catid=?)',id);
+		if(taskLowest>100 || taskDiffs['min']<0.1 || taskDiffs['max']>100){
+			taskIds = db.getAllSync('SELECT rowid FROM task WHERE catid=? ORDER BY rank',id).map(item=>item.rowid);
+			[...Array(taskIds.length).keys()].forEach(i=>{
+				db.runSync('UPDATE task SET rank=? WHERE rowid=?',(4*i)+1,taskIds[i]);
+			});
+		}
+	});
 }
