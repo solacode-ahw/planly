@@ -20,9 +20,10 @@ function TabBarButton({icon,fill,action}){ // component for the tab bar buttons
 
 export default function TabBar({state,navigation,theme}){ // component to replace the default tab bar of tab navigator
 	const name = state.routeNames[state.index];
+	const color = theme==='dark'?themeColors.primary.lightest:themeColors.primary.darkest;
 
 	return (
-		<PlanlyView transparent={false} style={styles.bar}>
+		<PlanlyView transparent={false} style={{...styles.bar,borderColor:color+'0F',shadowColor:color}}>
 			<TabBarButton icon='list' fill={name==='list'} action={()=>navigation.navigate('list')} />
 			<TabBarButton icon='plan' fill={name==='plan'} action={()=>navigation.navigate('plan')} />
 			<TabBarButton icon='archive' fill={name==='archive'} action={()=>navigation.navigate('archive')} />
@@ -39,8 +40,6 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		borderTopWidth: 1,
-		borderColor: themeColors.primary.darkest+'0F',
-		shadowColor: themeColors.primary.darkest,
 		elevation: 12,
 	},
 	button: {

@@ -22,7 +22,7 @@ export default function Header({navigation,route}){ // component to replace defa
 	const theme = getTheme(useContext(SettingsContext).thm);
 
 	return (
-		<PlanlyView transparent={false} style={styles.header}>
+		<PlanlyView transparent={false} style={{...styles.header,shadowColor:theme==='dark'?themeColors.primary.lightest:themeColors.primary.darkest}}>
 			<StatusBar backgroundColor={themeColors[theme]} barStyle={theme==='dark'?'light-content':'dark-content'} />
 			<Text style={styles.name}>PLANLY</Text>
 			<HeaderButton icon='about' fill={route.name==='about'} action={()=>navigation.navigate('about')} />
@@ -39,7 +39,6 @@ const styles = StyleSheet.create({
 		padding: 32,
 		gap: 32,
 		elevation: 4,
-		shadowColor: themeColors.primary.darkest,
 	},
 	name: {
 		alignContent: 'stretch',
