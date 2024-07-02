@@ -42,15 +42,15 @@ export function TaskItem ({task,picker,plan=false,pick=()=>{},items={},onEdit=()
 		onFlip();
 		setDone(!done);
 	};
-	const editTask = (title,note,catid) => {
+	const editTask = async(title,note,catid) => {
 		// edits task if it is edited in list page according to what's changed
 		if(catid===task.catid){
-			task.updateTask(title,note);
+			await task.updateTask(title,note);
 			setTitle(title);
 			setEdit(false);
 			onEdit(task.id);
 		} else {
-			task.updateTask(title,note,catid);
+			await task.updateTask(title,note,catid);
 			setTitle(title);
 			setEdit(false);
 			onEdit(task.id,1);
