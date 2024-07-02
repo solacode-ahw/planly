@@ -35,7 +35,7 @@ export class Categories {
 		// adds a category to the database and to the categories list of this object
 		const db = sqlite.openDatabaseSync('main');
 		const rank = await getCatRank(db);
-		const res = await db.runAsync(
+		const res = db.runSync(
 			'INSERT INTO category(title,color,rank) VALUES(?,?,?)',
 			[title,color,rank]
 		);
@@ -68,12 +68,12 @@ export class Categories {
 	async editCat(id,title,color){
 		// edits a category
 		const db = sqlite.openDatabaseSync('main');
-		await db.runAsync(
+		db.runSync(
 			'UPDATE category SET title=?,color=? WHERE rowid=?',
 			[title,color,id]
 		);
-		await this.getCats();
 		db.closeSync();
+		await this.getCats();
 	}
 	async removeCat(id){
 		// deletes a category from database and the categories list
@@ -82,11 +82,11 @@ export class Categories {
 			'SELECT rowid FROM task WHERE catid=?',
 			[id],
 		);
-		await db.runAsync(
+		db.runSync(
 			'DELETE FROM task WHERE catid=?',
 			id
 		);
-		await db.runAsync(
+		db.runSync(
 			'DELETE FROM category WHERE rowid=?',
 			id
 		);
@@ -103,7 +103,7 @@ export class Categories {
 		// adds a new task to the database and the respective category
 		db = sqlite.openDatabaseSync('main');
 		const rank = await getTaskRank(db,catid);
-		const res = await db.runAsync(
+		const res = db.runSync(
 			'INSERT INTO task(title,note,rank,catid) VALUES (?,?,?,?)',
 			[title,note,rank,catid]
 		);
@@ -118,7 +118,7 @@ export class Categories {
 	async removeTask(tid) {
 		// removes task from database and respective category
 		db = sqlite.openDatabaseSync('main');
-		await db.runAsync(
+		db.runSync(
 			'DELETE FROM task WHERE rowid=?',
 			[tid]
 		);
@@ -195,7 +195,7 @@ class Task {
 		// flips done properties
 		this.done = !this.done;
 		const db = sqlite.openDatabaseSync('main');
-		await db.runAsync(
+		db.runSync(
 			'UPDATE task SET done=? WHERE rowid=?',
 			[Number(this.done),this.id]
 		);
@@ -205,20 +205,21 @@ class Task {
 		// updates the task
 		const db = sqlite.openDatabaseSync('main');
 		if(catid===0){
-			await db.runAsync(
+			db.runSync(
 				'UPDATE task SET title=?,note=? WHERE rowid=?',
 				[title,note,this.id]
 			);
 		} else {
 			const rank = await getTaskRank(db,catid);
-			await db.runAsync(
-				'UPDATE task SET title=?,note=?,catid=?,rank=? WHERE rowid=?',
-				[title,note,catid,rank,this.id]
+			const new_db = sqlite.openDatabaseSync('main');
+			new_db.runSync(
+				'UPDATE task SET title=?,note=?,rank=?,catid=? WHERE rowid=?',
+				[title,note,rank,catid,this.id]
 			);
 			this.catid = catid;
 			this.rank = rank;
+			new_db.closeSync();
 		}
-		db.closeSync();
 		this.title=title;
 		this.note=note;
 	}
@@ -296,7 +297,7 @@ export class  Current {
 				});
 			}
 		});
-		const res = await db.runAsync(
+		const res = db.runSync(
 			'INSERT INTO archived(date,gratitude,tasks) VALUES(?,?,?)',
 			this.date.stringify(),
 			JSON.stringify(this.gratitude),
@@ -335,16 +336,15 @@ export async function initDB(){
 }
 
 async function getTaskRank(db,catid){
-	let rank = db.getFirstSync(
+	const rank = db.getFirstSync(
 		'SELECT max(rank) FROM task WHERE catid=?',
-		[catid]
+		catid
 	);
 	if(rank){
-		rank = rank['max(rank)']+4;
+		return rank['max(rank)']+4;
 	} else {
-		rank = 1;
+		return 1;
 	}
-	return rank;
 }
 async function getCatRank(db){
 	const rank = db.getFirstSync(
@@ -398,7 +398,7 @@ export async function getArchived(){
 }
 export async function deleteArchived(id){
 	const db = sqlite.openDatabaseSync('main');
-	await db.runAsync(
+	db.runSync(
 		'DELETE FROM archived WHERE rowid=?',
 		id
 	);
