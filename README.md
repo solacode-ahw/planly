@@ -27,7 +27,7 @@ It is written with React Native and Expo, made with love by
 * You can now drag and move categories and tasks.
 * Minor improvements and bug fixes.
 
-[DIRECT DOWNLOAD]() 
+[DIRECT DOWNLOAD](https://drive.proton.me/urls/053E35C754#lyX4vysSKk83) 
 __If you have previous versions installed, uninstall the old version before installing this new version.__
 
 _App tour is yet to be updated!_
