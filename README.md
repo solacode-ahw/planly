@@ -5,16 +5,13 @@ It is written with React Native and Expo, made with love by
 
 ![SolaCode](/assets/graphics/logo.png)
 
-## Download
-### version 1.0.0
-[DIRECT DOWNLOAD](https://drive.proton.me/urls/H7EV9291ER#jo59xU9LMZbr)
-
 ## Features
 * Helps you to keep your goal, and your reason in your mind.
 * You can group tasks into categories. And categories can be color coded.
 * You can write the date in any format you like.
 * Write 3 things you are grateful for, everyday.
 * Add tasks to your daily plan to get them done!
+* Reorder categories and tasks as you wish.
 * Review your past plans if you wish.
 * Supports both English and Farsi.
 
@@ -23,8 +20,19 @@ It is written with React Native and Expo, made with love by
 * Make sure to write down your why. After all, **He who has a why to live, can bear with almost any How!**
 * Try to write 3 things you are grateful for every day. It doesn't matter how small they are, they can remind you of the positive sides of life; which are usually overlooked!
 
+## Download
+### version 1.0.0
+[DIRECT DOWNLOAD](https://drive.proton.me/urls/H7EV9291ER#jo59xU9LMZbr)
+### version 1.1.0
+* You can now drag and move categories and tasks.
+* Minor improvements and bug fixes.
+
+[DIRECT DOWNLOAD]() 
+__If you have previous versions installed, uninstall the old version before installing this new version.__
+
+_App tour is yet to be updated!_
+
 ## Known Issues
-* App closes when trying to add a task from task picker
 
 ## In Future Updates
 * Import/Export
