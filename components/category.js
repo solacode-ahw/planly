@@ -95,7 +95,7 @@ export function CategoryItem({cat,refresh,picker,onDel,onEdit,onAddTask,onEditTa
 		return (
 			<PlanlyView style={styles.taskItem}>
 				<Pressable disabled={isActive} style={styles.mark} onLongPress={drag}>
-					<Image source={require('../assets/icons/move-light.png')} style={styles.mark} />
+					<Image source={require('../assets/icons/move-light.png')} style={styles.mark} tintColor={themeColors[color]} />
 				</Pressable>
 				<TaskItem task={item} picker={false} items={items} onEdit={onEditTask} onDel={onDelTask} onFlip={onTaskFlip} />
 			</PlanlyView>
