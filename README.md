@@ -34,7 +34,7 @@ __If you have v1.0.0 installed, uninstall the old version before installing this
 * App tour was updated.
 * Minor improvements and bug fixes.
 
-[DIRECT DOWNLOAD]() 
+[DIRECT DOWNLOAD](https://drive.proton.me/urls/2BK42SE9VM#e3CyttsHFET2) 
 __If you have v1.0.0 installed, uninstall the old version before installing this new version.__
 
 ## Known Issues
