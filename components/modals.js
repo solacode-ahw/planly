@@ -2,7 +2,7 @@ import { StyleSheet, Pressable, Image, ScrollView, View } from "react-native";
 import { useContext, useEffect, useRef, useState } from "react";
 
 import { SettingsContext } from "../utils/hooks";
-import { categoryColors } from "../utils/colors";
+import { categoryColors, themeColors } from "../utils/colors";
 import { newCatModal, editCatModal, newTaskModal, editTaskModal, viewTaskModal, archiveViewLabels } from "../utils/translations";
 import { getCat } from "../utils/data";
 
@@ -204,7 +204,10 @@ export function ViewArchive({date,grats,tasks,back,onDel}){
 
 	return (
 		<PlanlyView style={styles.modal}>
-			<LabelText style={styles.center}>{date}</LabelText>
+			<PlanlyView style={styles.row}>
+				<TitleText style={styles.stretch}>{date}</TitleText>
+				<TapButton icon='bin' action={onDel} />
+			</PlanlyView>
 			<PlanlyView style={styles.block}>
 				<LabelText>{archiveViewLabels.grats[lang]}</LabelText>
 				<BodyText>{`1. ${grats[0]}`}</BodyText>
@@ -219,7 +222,6 @@ export function ViewArchive({date,grats,tasks,back,onDel}){
 					)}
 				</ScrollView>
 			</PlanlyView>
-			<TextButton label={archiveViewLabels.delButton[lang]} action={onDel} style={{alignSelf: 'flex-start'}} />
 			<TapButton icon='down' action={back} style={styles.center} />
 		</PlanlyView>
 	);
@@ -306,9 +308,11 @@ const styles = StyleSheet.create({
 	stroked: {
 		textDecorationLine: 'line-through',
 		paddingStart: 20,
+		paddingVertical: 8,
 	},
 	normal: {
 		paddingStart: 20,
+		paddingVertical: 8,
 	},
 	center: {
 		alignSelf: 'center',
@@ -323,5 +327,10 @@ const styles = StyleSheet.create({
 	},
 	multiline: {
 		maxHeight: 125,
-	}
+	},
+	stretch: {
+		alignSelf: 'stretch',
+		flexGrow: 1,
+		flexShrink: 1,
+	},
 });

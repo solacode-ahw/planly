@@ -230,11 +230,7 @@ export const archiveViewLabels = {
 	tasks: {
 		en: 'I wanted to do:',
 		fa: 'می‌خواستم انجام دهم',
-	},
-	delButton: {
-		en: 'Remove',
-		fa: 'حذف',
-	},
+	}
 };
 
 export const settingsLabels = {
