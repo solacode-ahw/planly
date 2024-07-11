@@ -3,7 +3,7 @@ import { useState, useContext, useEffect } from "react";
 
 import { SettingsContext } from "../utils/hooks";
 import { themeColors } from "../utils/colors";
-import { getColor } from "../utils/functions";
+import { getColor, getTheme } from "../utils/functions";
 
 import { BodyText, PlanlyView } from "../components/basics";
 
@@ -12,8 +12,8 @@ function Action({icon,action,active=true}){
     const color = getColor(useContext(SettingsContext).thm);
 
     return (
-        <Pressable onPress={action} style={styles.actions}>
-            <Image source={icons[icon]} style={styles.actions} tintColor={active?themeColors[color]:themeColors.gray} />
+        <Pressable onPress={action} style={active?styles.actionsOutActive:styles.actionsOutInactive}>
+            <Image source={icons[icon]} style={styles.actionsIn} tintColor={active?themeColors.primary.original:themeColors.gray} />
         </Pressable>
     );
 }
@@ -31,6 +31,7 @@ function Indicator({active}){
 
 export default function Tour({show,setShow}){
     const lang = useContext(SettingsContext).lang;
+    const theme = getTheme(useContext(SettingsContext).thm);
     const color = getColor(useContext(SettingsContext).thm);
 
     const [slide,setSlide] = useState(0);
@@ -50,7 +51,7 @@ export default function Tour({show,setShow}){
 
     return (
         <Modal animationType="slide" transparent={true} visible={show} onRequestClose={()=>setShow(false)}>
-			<PlanlyView style={styles.modalOut}><PlanlyView transparent={false} style={{...styles.modalIn,shadowColor:themeColors[color]}}>
+			<PlanlyView style={styles.modalOut}><PlanlyView transparent={false} style={{...styles.modalIn,shadowColor:themeColors[color],backgroundColor:themeColors[theme]}}>
                 <Image source={images[lang][slide]} resizeMode="stretch" style={styles.image} />
                 <PlanlyView style={styles.nav}>
                     <Action icon={I18nManager.isRTL?'right':'left'} action={prev} active={slide>0} />
@@ -59,8 +60,8 @@ export default function Tour({show,setShow}){
                     </PlanlyView>
                     <Action icon={I18nManager.isRTL?'left':'right'} action={next} active={slide<n-1}/>
                 </PlanlyView>
-                <Pressable style={styles.button} onPress={()=>setShow(false)}>
-                    <BodyText style={styles.button}>{slide<n-1?message[lang][0]:message[lang][1]}</BodyText>
+                <Pressable style={styles.buttonOut} onPress={()=>setShow(false)}>
+                    <BodyText style={styles.buttonIn}>{slide<n-1?message[lang][0]:message[lang][1]}</BodyText>
                 </Pressable>
             </PlanlyView></PlanlyView>
 		</Modal>
@@ -79,46 +80,50 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '97.5%',
         display: 'flex',
-        paddingVertical: 16,
-        gap: 16,
+        paddingVertical: 32,
+        paddingHorizontal: 32,
+        gap: 24,
         flexDirection: 'column',
 		alignItems: 'center',
 		justifyContent: 'flex-start',
 		borderTopRightRadius: 32,
 		borderTopLeftRadius: 32,
 		elevation: 16,
-        backgroundColor: '#F0B955',
     },
-    actions: {
+    actionsOutActive: {
+        padding: 8,
+        borderRadius: 8,
+        borderColor: themeColors.primary.original,
+        borderWidth: 1,
+    },
+    actionsOutInactive: {
+        padding: 8,
+        borderRadius: 8,
+        borderColor: themeColors.gray,
+        borderWidth: 1,
+    },
+    actionsIn: {
         width: 20,
         height: 20,
     },
     indicatorActive: {
-        width: 10,
-        height: 10,
-        borderRadius: 5,
+        width: 8,
+        height: 8,
+        borderRadius: 4,
         backgroundColor: themeColors.primary.original,
     },
     indicatorInactive: {
-        width: 6,
-        height: 6,
-        borderRadius: 3,
-        backgroundColor: themeColors.primary.lighter,
+        width: 4,
+        height: 4,
+        borderRadius: 2,
+        backgroundColor: themeColors.gray,
     },
     image: {
         flex: 1,
         width: '100%',
-    },
-    imageContainer: {
-        flex: 1,
-        width: '100%',
-    },
-    imageStack: {
-        position: 'absolute',
-        top: 0,
-        start: 0,
-        width: '100%',
-        height: '100%',
+        borderColor: themeColors.primary.original,
+        borderWidth: 1,
+        borderRadius: 8,
     },
     nav: {
         display: 'flex',
@@ -126,7 +131,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 16,
     },
     indicators: {
         display: 'flex',
@@ -135,9 +139,17 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 6,
     },
-    button: {
+    buttonOut: {
+        width: '100%',
+        paddingVertical: 6,
+        borderRadius: 8,
+        borderColor: themeColors.primary.original,
+        borderWidth: 1,
+    },
+    buttonIn: {
         width: '100%',
         textAlign: 'center',
+        color: themeColors.primary.original
     },
 });
 
@@ -146,41 +158,21 @@ const icons = {
     right: require('../assets/icons/right-light.png'),
 };
 
-const n = 15;
+const n = 5;
 const images = {
     en: [
-        require('../assets/tour/en/01.jpg'),
-        require('../assets/tour/en/02.jpg'),
-        require('../assets/tour/en/03.jpg'),
-        require('../assets/tour/en/04.jpg'),
-        require('../assets/tour/en/05.jpg'),
-        require('../assets/tour/en/06.jpg'),
-        require('../assets/tour/en/07.jpg'),
-        require('../assets/tour/en/08.jpg'),
-        require('../assets/tour/en/09.jpg'),
-        require('../assets/tour/en/10.jpg'),
-        require('../assets/tour/en/11.jpg'),
-        require('../assets/tour/en/12.jpg'),
-        require('../assets/tour/en/13.jpg'),
-        require('../assets/tour/en/14.jpg'),
-        require('../assets/tour/en/15.jpg'),
+        require('../assets/tour/en/1.png'),
+        require('../assets/tour/en/2.png'),
+        require('../assets/tour/en/3.png'),
+        require('../assets/tour/en/4.png'),
+        require('../assets/tour/en/5.png'),
     ],
     fa: [
-        require('../assets/tour/fa/01.jpg'),
-        require('../assets/tour/fa/02.jpg'),
-        require('../assets/tour/fa/03.jpg'),
-        require('../assets/tour/fa/04.jpg'),
-        require('../assets/tour/fa/05.jpg'),
-        require('../assets/tour/fa/06.jpg'),
-        require('../assets/tour/fa/07.jpg'),
-        require('../assets/tour/fa/08.jpg'),
-        require('../assets/tour/fa/09.jpg'),
-        require('../assets/tour/fa/10.jpg'),
-        require('../assets/tour/fa/11.jpg'),
-        require('../assets/tour/fa/12.jpg'),
-        require('../assets/tour/fa/13.jpg'),
-        require('../assets/tour/fa/14.jpg'),
-        require('../assets/tour/fa/15.jpg'),
+        require('../assets/tour/fa/1.png'),
+        require('../assets/tour/fa/2.png'),
+        require('../assets/tour/fa/3.png'),
+        require('../assets/tour/fa/4.png'),
+        require('../assets/tour/fa/5.png'),
     ],
 };
 const message = {
