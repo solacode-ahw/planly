@@ -28,9 +28,14 @@ It is written with React Native and Expo, made with love by
 * Minor improvements and bug fixes.
 
 [DIRECT DOWNLOAD](https://drive.proton.me/urls/053E35C754#lyX4vysSKk83) 
-__If you have previous versions installed, uninstall the old version before installing this new version.__
+__If you have v1.0.0 installed, uninstall the old version before installing this new version.__
 
-_App tour is yet to be updated!_
+### version 1.1.1
+* App tour was updated.
+* Minor improvements and bug fixes.
+
+[DIRECT DOWNLOAD]() 
+__If you have v1.0.0 installed, uninstall the old version before installing this new version.__
 
 ## Known Issues
 
